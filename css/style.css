@@ -1,0 +1,136 @@
+label, input {
+    display: block;
+}
+
+input.text, textarea {
+    margin-bottom: 12px;
+    width: 95%;
+    padding: .4em;
+}
+
+fieldset {
+    padding: 0;
+    border: 0;
+    margin-top: 25px;
+}
+
+img.form-image {
+    margin-right: 10px;
+}
+
+.form-file, img.form-image  {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.form-image-remove {
+  display: block;
+  margin-bottom: 10px;
+}
+
+table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 99%;
+    margin: 6px;
+}
+
+th {
+    text-align: center;
+}
+
+td {
+    border: solid 1px #fab;
+    width: 100px;
+}
+
+.img-circle {
+    border-radius: 50%;
+}
+
+.truncate {
+    width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mdl-layout__drawer > .mdl-layout__title, .mdl-layout__drawer > .mdl-layout-title {
+    padding-left: 0px;
+}
+
+.mdl-layout__drawer {
+    width: 300px;
+    left: -150px;
+}
+
+.mdl-layout__drawer.is-visible {
+    left: 0;
+}
+
+#user-info {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#signout {
+    margin-top: 5px;
+}
+
+/*
+.sort {
+    padding: 8px 20px;
+    border-radius: 6px;
+    border: none;
+    color: #fff;
+    text-decoration: none;
+    background-color: #28a8e0;
+    height: 10px;
+}
+
+.sort:hover {
+    text-decoration: none;
+    background-color: #1b8aba;
+}
+
+.sort:focus {
+    outline: none;
+}
+
+.sort:after {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    content: "";
+    position: relative;
+    top: -10px;
+    right: -5px;
+}
+
+.sort.asc:after {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #fff;
+    content: "";
+    position: relative;
+    top: 4px;
+    right: -5px;
+}
+
+.sort.desc:after {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #fff;
+    content: "";
+    position: relative;
+    top: -4px;
+    right: -5px;
+}
+*/
