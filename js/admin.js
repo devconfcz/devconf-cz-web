@@ -231,9 +231,6 @@ function configure(config) {
     function createTabContent() {
         var html_tab_content = "<section class='mdl-layout__tab-panel' id='scroll-tab-" + config.model + "'>" +
             "<div class='page-content'>" +
-            "<button id='" + config.model + "-item-add' class='mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored'>" +
-            "<i class='material-icons'>add</i>" +
-            "</button>" +
             "<div id='" + config.model + "' class='page-content'>" +
             "<table id='" + config.model + "-table' class='mdl-data-table mdl-js-data-table mdl-shadow--2dp'>" +
             "<thead>" +
@@ -250,6 +247,9 @@ function configure(config) {
             "<tbody>" +
             "</tbody>" +
             "</table>" +
+            "<button id='" + config.model + "-item-add' class='mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored'>" +
+            "<i class='material-icons'>add</i>" +
+            "</button>" +
             "</div>" +
             "</div>" +
             "</section>";

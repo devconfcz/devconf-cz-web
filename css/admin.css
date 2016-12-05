@@ -18,14 +18,14 @@ img.form-image {
     margin-right: 10px;
 }
 
-.form-file, img.form-image  {
+.form-file, img.form-image {
     display: inline-block;
     vertical-align: middle;
 }
 
 .form-image-remove {
-  display: block;
-  margin-bottom: 10px;
+    display: block;
+    margin-bottom: 10px;
 }
 
 table {
@@ -75,6 +75,13 @@ td {
 
 #signout {
     margin-top: 5px;
+}
+
+.mdl-button--fab {
+    bottom: 20px;
+    position: fixed;
+    right: 24px;
+    z-index: 999;
 }
 
 /*
