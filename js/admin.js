@@ -5,13 +5,12 @@ $(function () {
         model: "speaker",
         fieldId: "key",
         fields: [
-            new FieldOption(FieldType.IMAGE, "avatar"),
+            new FieldOption(FieldType.IMAGE_URL, "avatar"),
             new FieldOption(FieldType.TEXT, "name"),
             new FieldOption(FieldType.TEXT, "email"),
             new FieldOption(FieldType.TEXT, "country"),
             new FieldOption(FieldType.TEXT, "twitter"),
             new FieldOption(FieldType.TEXTAREA, "bio"),
-            new FieldOption(FieldType.TEXTAREA, "about")
         ],
         data: {},
         databaseRef: firebase.database().ref().child("speakers"),
@@ -28,8 +27,18 @@ $(function () {
         });
     });
 
-    // -- Speakers ----------------------------------------------------------------------------------------------------
 });
+
+var FieldType = {};
+Object.defineProperty(FieldType, 'IMAGE', {value: "image"});
+Object.defineProperty(FieldType, 'IMAGE_URL', {value: "image_url"});
+Object.defineProperty(FieldType, 'TEXT', {value: "text"});
+Object.defineProperty(FieldType, 'TEXTAREA', {value: "textarea"});
+
+var FieldOption = function (type, name) {
+    this.type = type;
+    this.name = name;
+};
 
 function initializeFirebase() {
     var config = {
@@ -73,18 +82,6 @@ function login() {
     var ui = new firebaseui.auth.AuthUI(firebase.auth());
     ui.start("#firebaseui-auth-container", uiConfig);
 }
-
-// --
-
-var FieldType = {};
-Object.defineProperty(FieldType, 'IMAGE', {value: "image"});
-Object.defineProperty(FieldType, 'TEXT', {value: "text"});
-Object.defineProperty(FieldType, 'TEXTAREA', {value: "textarea"});
-
-var FieldOption = function (type, name) {
-    this.type = type;
-    this.name = name;
-};
 
 function configure(config) {
 
@@ -138,6 +135,7 @@ function configure(config) {
             newData[field.name] = data.val()[field.name];
             switch (field.type) {
                 case FieldType.IMAGE:
+                case FieldType.IMAGE_URL:
                     // TODO Review fixed width/height
                     var imageSrc = (newData[field.name]) ? newData[field.name] : "imgs/person-placeholder.jpg";
                     html += "<td class='" + field.name + "'><img src='" + imageSrc + "' class='img-circle' width='60px' height='60px' /></td>";
