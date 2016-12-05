@@ -10,7 +10,7 @@ $(function () {
             new FieldOption(FieldType.TEXT, "email"),
             new FieldOption(FieldType.TEXT, "country"),
             new FieldOption(FieldType.TEXT, "twitter"),
-            new FieldOption(FieldType.TEXTAREA, "bio"),
+            new FieldOption(FieldType.TEXTAREA, "bio")
         ],
         data: {},
         databaseRef: firebase.database().ref().child("speakers"),
