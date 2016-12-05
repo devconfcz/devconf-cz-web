@@ -5,12 +5,12 @@ $(function () {
         model: "speaker",
         fieldId: "key",
         fields: [
-            new FieldOption(FieldType.IMAGE_URL, "avatar"),
+            new FieldOption(FieldType.IMAGE_URL, "avatar", {size: 80}),
             new FieldOption(FieldType.TEXT, "name"),
             new FieldOption(FieldType.TEXT, "email"),
             new FieldOption(FieldType.TEXT, "country"),
             new FieldOption(FieldType.TEXT, "twitter"),
-            new FieldOption(FieldType.TEXTAREA, "bio")
+            new FieldOption(FieldType.TEXTAREA, "bio", {cols: 10})
         ],
         data: {},
         databaseRef: firebase.database().ref().child("speakers").orderByChild("name"),
@@ -35,9 +35,10 @@ Object.defineProperty(FieldType, 'IMAGE_URL', {value: "image_url"});
 Object.defineProperty(FieldType, 'TEXT', {value: "text"});
 Object.defineProperty(FieldType, 'TEXTAREA', {value: "textarea"});
 
-var FieldOption = function (type, name) {
+var FieldOption = function (type, name, options) {
     this.type = type;
     this.name = name;
+    this.options = options;
 };
 
 function initializeFirebase() {
@@ -116,9 +117,9 @@ function configure(config) {
             remove(itemId);
             // TODO Dynamic field
         }).on("click", ".form-image-remove", function (event) {
-            event.preventDefault();
-            alert('Not implemented yet');
-        });
+        event.preventDefault();
+        alert('Not implemented yet');
+    });
 
 
     // -- Firebase Database Triggers ----------------------------------------------------------------------------------
@@ -136,9 +137,10 @@ function configure(config) {
             switch (field.type) {
                 case FieldType.IMAGE:
                 case FieldType.IMAGE_URL:
-                    // TODO Review fixed width/height
                     var imageSrc = (newData[field.name]) ? newData[field.name] : "imgs/person-placeholder.jpg";
-                    html += "<td class='" + field.name + "'><img src='" + imageSrc + "' class='img-circle' width='60px' height='60px' /></td>";
+                    html += "<td class='" + field.name + "'>" +
+                        "<img src='" + imageSrc + "' class='img-circle' width='" + field.options.size + "px' height='" + field.options.size + "px' />" +
+                        "</td>";
                     break;
                 default:
                     // TODO Review fixed truncate class
@@ -284,7 +286,7 @@ function configure(config) {
                     // Add a thumb image
                     if (getValue(field, data) != "") {
                         html_form += "<img class='form-image' src='" + getValue(field.name, data) + "' " +
-                            "width='60dp' height='60px' />";                            
+                            "width='" + field.options.size + "px' height='" + field.options.size + "px' />";
                     }
                     html_form += "<span class='form-file'>" +
                         "<label for='" + config.model + "-" + field.name + "'>" + field.name + ":</label>" +
@@ -294,12 +296,12 @@ function configure(config) {
                     // Add an option to remove the thumb image
                     if (getValue(field, data) != "") {
                         html_form += "<a href='" + getValue(config.fieldId, data) + "' class='form-image-remove'>Remove</a>"
-                    }                        
+                    }
                     break;
                 case FieldType.TEXTAREA:
                     html_form += "<label for='" + config.model + "-" + field.name + "'>" + field.name + ":</label>" +
                         "<textarea id='" + config.model + "-" + field.name + "' " +
-                        "placeholder='" + field.name + "' rows='5'>" + getValue(field.name, data) + "</textarea>";
+                        "placeholder='" + field.name + "' rows='" + field.options.cols + "'>" + getValue(field.name, data) + "</textarea>";
                     break;
                 default:
                     html_form += "<label for='" + config.model + "-" + field.name + "'>" + field.name + ":</label>" +
