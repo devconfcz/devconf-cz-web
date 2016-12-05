@@ -13,7 +13,7 @@ $(function () {
             new FieldOption(FieldType.TEXTAREA, "bio")
         ],
         data: {},
-        databaseRef: firebase.database().ref().child("speakers"),
+        databaseRef: firebase.database().ref().child("speakers").orderByChild("name"),
         storageRef: firebase.storage().ref("speakers")
     });
 
