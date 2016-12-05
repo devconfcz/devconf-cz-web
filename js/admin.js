@@ -5,15 +5,16 @@ $(function () {
         model: "speaker",
         fieldId: "key",
         fields: [
-            new FieldOption(FieldType.IMAGE_URL, "avatar", {size: 80}),
+            new FieldOption(FieldType.IMAGE_URL, "avatar", {size: 60}),
             new FieldOption(FieldType.TEXT, "name"),
             new FieldOption(FieldType.TEXT, "email"),
             new FieldOption(FieldType.TEXT, "country"),
             new FieldOption(FieldType.TEXT, "twitter"),
-            new FieldOption(FieldType.TEXTAREA, "bio", {cols: 10})
+            new FieldOption(FieldType.TEXTAREA, "bio", {cols: 10, truncate: 50})
         ],
         data: {},
-        databaseRef: firebase.database().ref().child("speakers").orderByChild("name"),
+        databaseRef: firebase.database().ref().child("speakers"),
+        databaseOrder: "name",
         storageRef: firebase.storage().ref("speakers")
     });
 
@@ -114,7 +115,11 @@ function configure(config) {
             event.preventDefault();
 
             var itemId = $(this).closest("tr").find("." + config.fieldId).text();
-            remove(itemId);
+
+            var dialog = document.querySelector('dialog');
+            dialog.showModal();
+
+            // remove(itemId);
             // TODO Dynamic field
         }).on("click", ".form-image-remove", function (event) {
         event.preventDefault();
@@ -127,7 +132,7 @@ function configure(config) {
     /**
      * On new data was added in Firebase Database
      */
-    config.databaseRef.on("child_added", function (data) {
+    config.databaseRef.orderByChild(config.databaseOrder).on("child_added", function (data) {
         var newData = {};
         var html = "<tr>";
         html += "<td class='" + config.fieldId + "' style='display: none;'>" + data.key + "</td>";
@@ -143,8 +148,8 @@ function configure(config) {
                         "</td>";
                     break;
                 default:
-                    // TODO Review fixed truncate class
-                    html += "<td class='" + field.name + " mdl-data-table__cell--non-numeric truncate'>" + newData[field.name] + "</td>";
+                    var value = (field.options && field.options.truncate) ? newData[field.name].substring(0, field.options.truncate) + "..." : newData[field.name];
+                    html += "<td class='" + field.name + " mdl-data-table__cell--non-numeric'>" + value + "</td>";
                     break;
             }
 
@@ -152,10 +157,10 @@ function configure(config) {
 
         html += "<td class='edit'>" +
             "<button class='" + config.model + "-item-edit mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored'>" +
-            "Edit" +
+            "<i class='material-icons'>edit</i>" +
             "</button> &nbsp" +
             "<button class='" + config.model + "-item-remove mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent'>" +
-            "Remove" +
+            "<i class='material-icons'>delete</i>" +
             "</button>" +
             "</td>";
 
@@ -163,7 +168,7 @@ function configure(config) {
 
         $("#" + config.model + "-table > tbody:last-child").append(html);
 
-        config.data[data.key] = newData
+        config.data[data.key] = newData;
     });
 
     /**
@@ -182,6 +187,7 @@ function configure(config) {
             // Update the UI
             switch (field.type) {
                 case FieldType.IMAGE:
+                case FieldType.IMAGE_URL:
                     // Prevent update imagem until image was not completed uploaded
                     var imageSrc = data.val()[field.name];
                     if ((imageSrc) && (!imageSrc.includes("fakepath"))) {
@@ -189,7 +195,8 @@ function configure(config) {
                     }
                     break;
                 default:
-                    tableRow.find('td.' + field.name).text(data.val()[field.name]);
+                    var value = (field.options && field.options.truncate) ? data.val()[field.name].substring(0, field.options.truncate) + "..." : data.val()[field.name];
+                    tableRow.find('td.' + field.name).text(value);
                     break;
             }
 
@@ -241,7 +248,7 @@ function configure(config) {
             html_tab_content += "<th class='sort mdl-data-table__cell--non-numeric' data-sort='" + field.name + "'>" + field.name + "</th>";
         });
 
-        html_tab_content += "<th>-</th>" +
+        html_tab_content += "<th></th>" +
             "</tr>" +
             "</thead>" +
             "<tbody>" +

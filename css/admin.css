@@ -29,8 +29,6 @@ img.form-image {
 }
 
 table {
-    border-collapse: collapse;
-    table-layout: fixed;
     width: 99%;
     margin: 6px;
 }
@@ -41,7 +39,16 @@ th {
 
 td {
     border: solid 1px #fab;
-    width: 100px;
+}
+
+td img{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+td.edit {
+    text-align: center;
 }
 
 .img-circle {
