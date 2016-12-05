@@ -24,34 +24,37 @@ function speaker() {
 
     // -- Firebase Database Triggers ----------------------------------------------------------------------------------
 
-    var count = 0;
+    var gridContainer = $(".container");
+    var count = 1;
     var speakersRef = firebase.database().ref().child("speakers");
 
     function addNewCard(data) {
-        var html = "<div class='speaker-card mdl-card mdl-shadow--2dp col-md-4'>" +
-            "<div class='mdl-card__title'>" +
-                "<h2 class='mdl-card__title-text'>" + data.name + "</h2>" +
+        var html = "<div class='speaker-card mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col'>" +
+            "<div class='mdl-card__title' style='background-image: url(\"" + data.avatar + "\")'>" +
+            "<div class='mdl-card__title-text'>" +
+            "<span class='name'>" + data.name + "</span>" +
+            "</div>" +
             "</div>" +
             "<div class='mdl-card__supporting-text'>" + data.bio + "</div>" +
-            "<div class='mdl-card__actions mdl-card--border'>" +
-                "<a class='mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect'>" +
-                "Some links" +
-                "</a>" +
-            "</div>" +
+            "<div class='mdl-card__actions mdl-card--border'>";
+        html += "<a href='http://twitter.com/" + data.twitter + "'><i class='zmdi zmdi-twitter zmdi-hc-2x'></i></a>";
+        html += "</div>" +
             "</div>";
 
-        $("#container-fluid").append(html);
+        $('.container div.mdl-grid:last').append(html);
     }
 
-    speakersRef.on('child_added', function _add(snap, prevChild) {
-        if((count == 0) || ((count % 3) == 0)) {
-            $("#container").append("<div class='row'>");
+    speakersRef.orderByChild("name").on('child_added', function _add(snap, prevChild) {
+        if (count == 1) {
+            gridContainer.append("<div class='mdl-grid'>");
         }
         addNewCard(snap.val());
-        count++;
-        if((count > 0) && ((count % 3) == 0)) {
-            $("#container").append("</div>");
+        if ((count > 1) && ((count % 3) == 0)) {
+            console.log(count)
+            gridContainer.append("</div>");
+            gridContainer.append("<div class='mdl-grid'>");
         }
+        count++;
     });
 
 
