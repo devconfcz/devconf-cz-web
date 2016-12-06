@@ -15,10 +15,15 @@
     height: 350px;
     background-size: cover;
     background-position: center;
+    border-top: 1px solid rgba(0,0,0,.1);
+    background-image: url('/imgs/person-placeholder.jpg');
 }
 
 .speaker-card > .mdl-card__title .name {
     font-size: 24px;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px black;
+    padding: 5px;
 }
 
 .speaker-card > .mdl-card__supporting-text {
