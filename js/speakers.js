@@ -32,18 +32,22 @@ function speaker() {
 
     // -- Helper methods ----------------------------------------------------------------------------------------------
 
-    function addNewSpeakerCard(data) {
-        var html = "<div class='speaker speakers-page mdl-card mdl-shadow--2dp'>" +
-            "<div class='mdl-card__title' style='background-image: url(\"" + data.avatar + "\")'>" +
-            "<div class='mdl-card__title-text'>" +
-            "<span class='name'>" + data.name + "</span>" +
+    function addNewSpeakerCard(speaker) {
+        var html = "<div class='speaker speakers-page card hoverable'>" +
+            "<div class='card-image' style='background-image: url(\"" + speaker.avatar + "\")'>" +
+            "<span class='card-title'>" + speaker.name + "</span>" +
             "</div>" +
-            "</div>" +
-            "<div class='mdl-card__supporting-text'>" + data.bio + "</div>" +
-            "<div class='mdl-card__actions mdl-card--border'>";
-        html += "<a href='http://twitter.com/" + data.twitter + "'><i class='zmdi zmdi-twitter zmdi-hc-2x'></i></a>";
-        html += "</div>" +
+            "<div class='card-content'>" +
+            speaker.bio +
             "</div>";
+        // Card Actions
+        // html += "<div class='card-action'>";
+        // if (speaker.twitter) {
+        //     html += "<a href='http://twitter.com/" + speaker.twitter + "'>" +
+        //         "<img src='assets/icons/twitter-icon.png' width='40px' height='40px' />" +
+        //         "</a>";
+        // }
+        // html += "</div>";
 
         $('.speakers-container').append(html);
     }

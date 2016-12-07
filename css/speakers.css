@@ -1,10 +1,3 @@
-@media (min-width: 1400px) {
-    .container.speakers-page {
-        margin: 0 auto;
-        max-width: 1280px;
-    }
-}
-
 .speakers-container.speakers-page {
     display: flex;
     flex-flow: column wrap;
@@ -34,33 +27,32 @@
     }
 }
 
-.speaker.speakers-page > .mdl-card__title {
+.speaker.speakers-page.card > .card-image {
     color: #fff;
     height: 250px;
     background-size: cover;
     background-position: center;
     border-top: 1px solid rgba(0, 0, 0, .1);
-    background-image: url('/imgs/person-placeholder.jpg');
+    background-image: url('/assets/imgs/person-placeholder.jpg');
 }
 
-.speaker.speakers-page > .mdl-card__title .name {
-    font-size: 48px;
+.speaker.speakers-page.card > .card-image > .card-title {
+    font-size: 36px;
     font-weight: bold;
     text-shadow: 1px 1px 3px black;
     padding: 5px;
+    margin-left: 10px;
+    line-height: 1.2;
 }
 
-.speaker.speakers-page > .mdl-card__supporting-text {
-    margin-left: 3px;
-    height: 150px;
+.speaker.speakers-page.card > .card-content {
+    height: 200px;
     color: #212121;
-    font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: 400;
-    line-height: 1.4;
     text-align: justify;
     font-size: 12px;
 }
 
-.speaker.speakers-page > .mdl-card__actions > a > i.zmdi {
-    margin-left: 20px;
+.speaker.speakers-page.card > .card-action {
+    padding: 10px 10px 5px 10px;
 }
