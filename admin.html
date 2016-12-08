@@ -1,67 +1,55 @@
 <!DOCTYPE html>
-<html>
-<body>
-
-<div id="content">
-    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-        <header class="mdl-layout__header">
-            <div class="mdl-layout__header-row">
-                <!-- Title -->
-                <span class="mdl-layout-title">DevConf CZ 2017 - Admin</span>
-            </div>
-            <!-- Tabs -->
-            <div class="mdl-layout__tab-bar mdl-js-ripple-effect">
-            </div>
-        </header>
-        <div class="mdl-layout__drawer">
-            <span class="mdl-layout-title">
-                <div id="user-info">
-                    <p>
-                        <img id="user-photo" class="img-circle" width="150px" height="150px"/> <br/>
-                        <span id="user-name"></span> <br/>
-                        <span id="user-email"></span> <br/>
-                        <button id="signout"
-                                class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent'>
-                            Sign out
-                        </button>
-                    </p>
-                </div>
-            </span>
-        </div>
-        <main class="mdl-layout__content">
-        </main>
-    </div>
-
-    <dialog class="mdl-dialog">
-        <h4 class="mdl-dialog__title">Allow data collection?</h4>
-        <div class="mdl-dialog__content">
-        </div>
-        <div class="mdl-dialog__actions">
-            <button type="button" class="mdl-button">Agree</button>
-            <button type="button" class="mdl-button close">Disagree</button>
-        </div>
-    </dialog>
-</div>
-
-<div id="firebaseui-auth-container">
-</div>
-
-<script type="text/javascript" src="https://www.gstatic.com/firebasejs/3.6.0/firebase.js"></script>
-<script type="text/javascript" src="https://www.gstatic.com/firebasejs/ui/live/1.0/firebase-ui-auth.js"></script>
-<script type="text/javascript" src="https://code.getmdl.io/1.2.1/material.min.js"></script>
-<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-<script type="text/javascript" src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
-<script type="text/javascript" src="js/admin.js"></script>
-
-<link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/live/1.0/firebase-ui-auth.css"/>
-<link type="text/css" rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/smoothness/jquery-ui.css"/>
-<link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-<link type="text/css" rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.indigo-red.min.css">
-<link type="text/css" rel="stylesheet" href="css/admin.css"/>
-
-</body>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
+    <script type="text/javascript" src="https://www.gstatic.com/firebasejs/3.6.0/firebase.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/firebasejs/ui/live/1.0/firebase-ui-auth.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+    <script type="text/javascript" src="js/admin.js"></script>
+
+    <link type="text/css" href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+    <link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+    <link type="text/css" rel="stylesheet" href="css/admin.css">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
     <title>DevConf CZ 2017 - Admin</title>
 </head>
+<body>
+<div id="firebaseui-auth-container">
+</div>
+<div id="container">
+    <div class="navbar-fixed">
+        <nav class="nav-extended">
+            <div class="nav-wrapper">
+                <a href="#!" class="brand-logo"><img src="assets/logo/devconf-cz-webopt.svg"/></a>
+                <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+                <ul class="right hide-on-med-and-down">
+                    <li>
+                        <img class="user-photo circle responsive-img"/>
+                    </li>
+                    <li>
+                        <span class="user-email"></span>
+                    </li>
+                    <li>
+                        <a id="signout" href="#"><i class="material-icons">input</i></a>
+                    </li>
+                </ul>
+                <ul class="side-nav" id="mobile-demo">
+                    <li>
+                        <img id="user-photo" class="img-circle"/>
+                        <span id="user-email"></span>
+                        <a href="#"><i class="material-icons">input</i></a>
+                    </li>
+                </ul>
+            </div>
+            <ul class="tabs tabs-transparent">
+            </ul>
+        </nav>
+    </div>
+</div>
+</body>
 </html>

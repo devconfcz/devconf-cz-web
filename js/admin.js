@@ -5,12 +5,12 @@ $(function () {
         model: "speaker",
         fieldId: "key",
         fields: [
-            new FieldOption(FieldType.IMAGE_URL, "avatar", {size: 60}),
+            new FieldOption(FieldType.IMAGE_URL, "avatar", {size: 50}),
             new FieldOption(FieldType.TEXT, "name"),
             new FieldOption(FieldType.TEXT, "email"),
             new FieldOption(FieldType.TEXT, "country"),
             new FieldOption(FieldType.TEXT, "twitter"),
-            new FieldOption(FieldType.TEXTAREA, "bio", {cols: 10, truncate: 50})
+            new FieldOption(FieldType.TEXTAREA, "bio", {cols: 10, truncate: 70})
         ],
         data: {},
         databaseRef: firebase.database().ref().child("speakers"),
@@ -18,17 +18,14 @@ $(function () {
         storageRef: firebase.storage().ref("speakers")
     });
 
-    // Signout
-    $("#signout").click(function (event) {
-        event.preventDefault();
-        firebase.auth().signOut().then(function () {
-            console.log("Signed Out");
-        }, function (error) {
-            console.error("Sign Out Error", error);
-        });
-    });
-
+    // Force select the first tab
+    var firstTabName = $("ul.tabs li.tab:first a").attr('href').substring(1);
+    $('ul.tabs').tabs('select_tab', firstTabName);
 });
+
+String.prototype.capitalizeFirstLetter = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
 
 var FieldType = {};
 Object.defineProperty(FieldType, 'IMAGE', {value: "image"});
@@ -55,22 +52,38 @@ function initializeFirebase() {
 
     firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
-                $("#user-photo").attr("src", user.photoURL);
-                $("#user-name").text(user.displayName);
-                $("#user-email").text(user.email);
+                $("#container").hide();
 
-                $("#content").show();
-                $("#tabs").tabs();
+                $(".user-photo").attr("src", user.photoURL);
+                $(".user-name").text(user.displayName);
+                $(".user-email").text(user.email);
+
                 $("#firebaseui-auth-container").hide();
+
+                $('ul.tabs').tabs();
+                $(".button-collapse").sideNav();
+                $('.modal').modal();
+
+                $("#container").show();
             } else {
                 $("#firebaseui-auth-container").show();
-                $("#content").hide();
+                $("#container").hide();
                 login();
             }
         }, function (error) {
             console.log(error);
         }
     );
+
+    // Signout
+    $("#signout").click(function (event) {
+        event.preventDefault();
+        firebase.auth().signOut().then(function () {
+
+        }, function (error) {
+            console.error("Sign Out Error", error);
+        });
+    });
 }
 
 function login() {
@@ -87,281 +100,124 @@ function login() {
 
 function configure(config) {
 
-    // Add a tab bar/content for this model
-    $(".mdl-layout__tab-bar").append(createTabBar());
-    $(".mdl-layout__content").append(createTabContent());
+    // Add a new tab bar and a table to display data model list
+    $("ul.tabs").append(createTab());
+    $("#container").append(createDataModelTable());
 
+    // Create a modal and a form to create/update a data model
+    $("#container").append(createModalForm());
 
-    // -- Crud buttons trigger ----------------------------------------------------------------------------------------
-
+    // -- Buttons trigger ----------------------------------------------------------------------------------------
 
     $("body")
-        .on("click", "#" + config.model + "-item-add", function (event) {
+        .on("click", "#" + createIdName("item-add"), function (event) {
             event.preventDefault();
             openModalForm();
         })
-        .on("click", "." + config.model + "-item-edit", function (event) {
+        .on("click", "." + createIdName("item-edit"), function (event) {
             event.preventDefault();
 
-            var itemId = $(this).closest("tr").find("." + config.fieldId).text();
-            var itemSelected = config.data[itemId];
+            var key = $(this).closest("tr").find("." + config.fieldId).text();
+            var itemSelected = config.data[key];
 
             // Add item id in the data to pass to edit form
-            itemSelected[config.fieldId] = itemId;
+            itemSelected[config.fieldId] = key;
 
             openModalForm(itemSelected);
         })
-        .on("click", "." + config.model + "-item-remove", function (event) {
+        .on("click", "." + createIdName("item-remove"), function (event) {
             event.preventDefault();
 
-            var itemId = $(this).closest("tr").find("." + config.fieldId).text();
+            var key = $(this).closest("tr").find("." + config.fieldId).text();
 
-            var dialog = document.querySelector('dialog');
-            dialog.showModal();
-
-            // remove(itemId);
-            // TODO Dynamic field
-        }).on("click", ".form-image-remove", function (event) {
-        event.preventDefault();
-        alert('Not implemented yet');
-    });
-
+            removeData(key);
+        })
+        .on("click", "#" + createIdName('item-save'), function (event) {
+            event.preventDefault();
+            saveData($("#" + createIdName("form")));
+            $("#" + createIdName("modal-form")).modal('close');
+        });
 
     // -- Firebase Database Triggers ----------------------------------------------------------------------------------
 
     /**
      * On new data was added in Firebase Database
      */
-    config.databaseRef.orderByChild(config.databaseOrder).on("child_added", function (data) {
-        var newData = {};
-        var html = "<tr>";
-        html += "<td class='" + config.fieldId + "' style='display: none;'>" + data.key + "</td>";
+    config.databaseRef.orderByChild(config.databaseOrder).on("child_added", function (snapshot) {
+        var dataModel = parseDataModelFromFirebaseSnapshot(snapshot);
 
-        $.each(config.fields, function (index, field) {
-            newData[field.name] = data.val()[field.name];
-            switch (field.type) {
-                case FieldType.IMAGE:
-                case FieldType.IMAGE_URL:
-                    var imageSrc = (newData[field.name]) ? newData[field.name] : "imgs/person-placeholder.jpg";
-                    html += "<td class='" + field.name + "'>" +
-                        "<img src='" + imageSrc + "' class='img-circle' width='" + field.options.size + "px' height='" + field.options.size + "px' />" +
-                        "</td>";
-                    break;
-                default:
-                    var value = (field.options && field.options.truncate) ? newData[field.name].substring(0, field.options.truncate) + "..." : newData[field.name];
-                    html += "<td class='" + field.name + " mdl-data-table__cell--non-numeric'>" + value + "</td>";
-                    break;
-            }
+        // Add new data to a local cache
+        config.data[snapshot.key] = dataModel;
 
-        });
-
-        html += "<td class='edit'>" +
-            "<button class='" + config.model + "-item-edit mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored'>" +
-            "<i class='material-icons'>edit</i>" +
-            "</button> &nbsp" +
-            "<button class='" + config.model + "-item-remove mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent'>" +
-            "<i class='material-icons'>delete</i>" +
-            "</button>" +
-            "</td>";
-
-        html += "</tr>";
-
-        $("#" + config.model + "-table > tbody:last-child").append(html);
-
-        config.data[data.key] = newData;
+        addNewTableRow(snapshot.key, dataModel);
     });
 
     /**
      * On data was changed in Firebase Database
      */
-    config.databaseRef.on("child_changed", function (data) {
+    config.databaseRef.on("child_changed", function (snapshot) {
 
-        var newValues = {};
-        var tableRow = $("td." + config.fieldId).filter(function () {
-            return $(this).text() == data.key;
-        }).closest("tr");
+        var dataModel = parseDataModelFromFirebaseSnapshot(snapshot);
 
-        $.each(config.fields, function (index, field) {
-            // Update data model
-            newValues[field.name] = data.val()[field.name];
-            // Update the UI
-            switch (field.type) {
-                case FieldType.IMAGE:
-                case FieldType.IMAGE_URL:
-                    // Prevent update imagem until image was not completed uploaded
-                    var imageSrc = data.val()[field.name];
-                    if ((imageSrc) && (!imageSrc.includes("fakepath"))) {
-                        tableRow.find('td.' + field.name + " img").attr("src", imageSrc);
-                    }
-                    break;
-                default:
-                    var value = (field.options && field.options.truncate) ? data.val()[field.name].substring(0, field.options.truncate) + "..." : data.val()[field.name];
-                    tableRow.find('td.' + field.name).text(value);
-                    break;
-            }
+        // Update data in the local cache
+        config.data[snapshot.key] = dataModel;
 
-        });
-
-        config.data[data.key] = newValues;
+        updataTableRow(snapshot.key, dataModel);
     });
 
     /**
      * On data was removed in Firebase Database
      */
-    config.databaseRef.on("child_removed", function (data) {
-        delete config.data[data.key];
-        var tableRow = $("td." + config.fieldId).filter(function () {
-            return $(this).text() == data.key;
-        }).closest("tr");
-        tableRow.css("background-color", "#FF3700");
-        tableRow.fadeOut(400, function () {
-            tableRow.remove();
-        });
+    config.databaseRef.on("child_removed", function (snapshot) {
+
+        // Remove data from the local cache
+        delete config.data[snapshot.key];
+
+        removeTableRow(snapshot.key);
     });
 
     // -- Helper methods ----------------------------------------------------------------------------------------------
 
     /**
-     * Mount a tab html with the data model name
+     * Centralize a way to create
      *
-     * @returns {string} Tab bar HTML
+     * @param to Something to identify for where it will be used
+     * @returns {*} Formatted name to use in HTML id or class
      */
-    function createTabBar() {
-        return "<a href='#scroll-tab-" + config.model + "' class='mdl-layout__tab'>" + config.model + "</a>";
+    // TOOD Rename
+    function createIdName(to) {
+        return (to) ? config.model + "-" + to : config.model;
     }
 
     /**
-     * Mount a form html to be used in a tab
+     * Parse data model from Firebase snapshot
      *
-     * @returns {string} Tab content HTML
+     * @returns Data model
      */
-    function createTabContent() {
-        var html_tab_content = "<section class='mdl-layout__tab-panel' id='scroll-tab-" + config.model + "'>" +
-            "<div class='page-content'>" +
-            "<div id='" + config.model + "' class='page-content'>" +
-            "<table id='" + config.model + "-table' class='mdl-data-table mdl-js-data-table mdl-shadow--2dp'>" +
-            "<thead>" +
-            "<tr>" +
-            "<th class='sort' data-sort='" + config.fieldId + "' style='display: none'>ID</th>";
+    function parseDataModelFromFirebaseSnapshot(snapshot) {
+        var data = {};
 
-        config.fields.forEach(function (field) {
-            html_tab_content += "<th class='sort mdl-data-table__cell--non-numeric' data-sort='" + field.name + "'>" + field.name + "</th>";
+        $.each(config.fields, function (index, field) {
+            data[field.name] = snapshot.val()[field.name];
         });
 
-        html_tab_content += "<th></th>" +
-            "</tr>" +
-            "</thead>" +
-            "<tbody>" +
-            "</tbody>" +
-            "</table>" +
-            "<button id='" + config.model + "-item-add' class='mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored'>" +
-            "<i class='material-icons'>add</i>" +
-            "</button>" +
-            "</div>" +
-            "</div>" +
-            "</section>";
-
-        return html_tab_content;
+        return data;
     }
 
     /**
-     * Get field value from data
+     * Parse data model from form
      *
-     * @param fieldName Name of the data model field
-     * @param data Model data
-     * @returns {string} Value of the data model field of blank ("")
+     * @returns Data model
      */
-    function getValue(fieldName, data) {
-        return (!data) ? "" : data[fieldName];
-    }
-
-    /**
-     * Mount a form html to be used in a "modal" based in the config fields array
-     *
-     * @param data Model data
-     * @returns {string} HTML form
-     */
-    function createFormHtml(data) {
-
-        var html_form = "<form><fieldset>" +
-            "<input type='hidden' id='" + config.model + "-" + config.fieldId + "' " +
-            "value='" + getValue(config.fieldId, data) + "'/>";
-
-        config.fields.forEach(function (field) {
-            switch (field.type) {
-                case FieldType.IMAGE:
-                    // Add a thumb image
-                    if (getValue(field, data) != "") {
-                        html_form += "<img class='form-image' src='" + getValue(field.name, data) + "' " +
-                            "width='" + field.options.size + "px' height='" + field.options.size + "px' />";
-                    }
-                    html_form += "<span class='form-file'>" +
-                        "<label for='" + config.model + "-" + field.name + "'>" + field.name + ":</label>" +
-                        "<input type='file' id='" + config.model + "-" + field.name + "' " +
-                        "placeholder='" + field.name + "' class='text ui-widget-content ui-corner-all'/>" +
-                        "</span>";
-                    // Add an option to remove the thumb image
-                    if (getValue(field, data) != "") {
-                        html_form += "<a href='" + getValue(config.fieldId, data) + "' class='form-image-remove'>Remove</a>"
-                    }
-                    break;
-                case FieldType.TEXTAREA:
-                    html_form += "<label for='" + config.model + "-" + field.name + "'>" + field.name + ":</label>" +
-                        "<textarea id='" + config.model + "-" + field.name + "' " +
-                        "placeholder='" + field.name + "' rows='" + field.options.cols + "'>" + getValue(field.name, data) + "</textarea>";
-                    break;
-                default:
-                    html_form += "<label for='" + config.model + "-" + field.name + "'>" + field.name + ":</label>" +
-                        "<input type='text' id='" + config.model + "-" + field.name + "' " +
-                        "value='" + getValue(field.name, data) + "' " +
-                        "placeholder='" + field.name + "' class='text ui-widget-content ui-corner-all'/>";
-                    break;
-            }
-        });
-        html_form += "</fieldset></form>";
-
-        return html_form;
-    }
-
-    /**
-     * Open a model window with the dinamic form created with createFormHtml
-     * @param data model data
-     */
-    function openModalForm(data) {
-        $("<div id='" + config.model + "-form' title='" + config.model + "'></div>").dialog({
-            width: 900,
-            height: 700,
-            modal: true,
-            title: config.model,
-            open: function () {
-                $(this).html(createFormHtml(data));
-            },
-            buttons: {
-                "Save": function () {
-                    saveData($(this).parent());
-                    $(this).dialog("close");
-                },
-                "Cancel": function () {
-                    $(this).dialog("close");
-                }
-            }
-        });
-    }
-
-    /**
-     * Create a JSON model data from the form
-     *
-     * @returns Model data in JSON format
-     */
-    function JsonDataFromForm(form) {
+    function parseDataModelFromForm(form) {
         var data = {};
 
         // Add item id in the data to pass to save method
-        data[config.fieldId] = $(form).find("#" + config.model + "-" + config.fieldId).val();
+        data[config.fieldId] = $(form).find("#" + createIdName(config.fieldId)).val();
 
         $.each(config.fields, function (index, field) {
             if (field.type != FieldType.IMAGE) {
-                data[field.name] = $(form).find("#" + config.model + "-" + field.name).val();
+                data[field.name] = $(form).find("#" + createIdName(field.name)).val();
             }
         });
 
@@ -369,11 +225,223 @@ function configure(config) {
     }
 
     /**
+     * Create a html tab html for the data model
+     *
+     * @returns {string} Tab bar HTML
+     */
+    function createTab() {
+        return "<li class='tab'><a href='#" + createIdName("tab") + "'>" + config.model + "</li>";
+    }
+
+    /**
+     * Create a table to display a list of data model in the tab
+     *
+     * @returns {string} Tab content HTML
+     */
+    function createDataModelTable() {
+        var html = "<div id='" + createIdName("tab") + "'>" +
+            "<div id='" + createIdName() + "' class='page-content'>" +
+            "<table id='" + createIdName("table") + "' class='model-table bordered highlight responsive-table'>" +
+            "<thead>" +
+            "<tr>" +
+            "<th style='display: none'>ID</th>";
+
+        config.fields.forEach(function (field) {
+            html += "<th data-field='" + field.name + "'>" + field.name + "</th>";
+        });
+
+        html += "<th class='controls'></th>" +
+            "</tr>" +
+            "</thead>" +
+            "<tbody>" +
+            "</tbody>" +
+            "</table>" +
+            "<a href='#' id='" + createIdName("item-add") + "' class='btn-floating btn-large waves-effect waves-light red'><i class='material-icons'>add</i></a>" +
+            "</div>" +
+            "</div>";
+
+        return html;
+    }
+
+    /**
+     * Add a new row in the data model table
+     *
+     * @param key of the row/data
+     * @param data Data model instance
+     */
+    function addNewTableRow(key, data) {
+        var html = "<tr>";
+        html += "<td class='" + config.fieldId + "' style='display: none;'>" + key + "</td>";
+
+        $.each(config.fields, function (index, field) {
+            switch (field.type) {
+                case FieldType.IMAGE:
+                case FieldType.IMAGE_URL:
+                    var imageSrc = (data[field.name]) ? data[field.name] : "assets/imgs/person-placeholder.jpg";
+                    html += "<td class='" + field.name + "'>" +
+                        "<img src='" + imageSrc + "' class='circle' width='" + field.options.size + "px' height='" + field.options.size + "px' />" +
+                        "</td>";
+                    break;
+                default:
+                    var value = (field.options && field.options.truncate) ? data[field.name].substring(0, field.options.truncate) + "..." : data[field.name];
+                    html += "<td class='" + field.name + " mdl-data-table__cell--non-numeric'>" + value + "</td>";
+                    break;
+            }
+
+        });
+
+        html += "<td class='edit'>" +
+            "&nbsp;" +
+            "<a href='#' class='" + createIdName("item-edit") + "'>" +
+            "<i class='material-icons'>edit</i>" +
+            "</a> &nbsp; &nbsp;" +
+            "<a href='#' class='" + createIdName("item-remove") + "'>" +
+            "<i class='material-icons'>delete</i>" +
+            "</a>" +
+            "&nbsp;" +
+            "</td>";
+
+        html += "</tr>";
+
+        $("#" + createIdName("table") + " > tbody:last-child").append(html);
+    }
+
+    /**
+     * Update model value in the data model table
+     *
+     * @param key of the row/data
+     * @param data Data model instance
+     */
+    function updataTableRow(key, data) {
+        var tableRow = $("td." + config.fieldId).filter(function () {
+            return $(this).text() == key;
+        }).closest("tr");
+
+        $.each(config.fields, function (index, field) {
+            switch (field.type) {
+                case FieldType.IMAGE:
+                case FieldType.IMAGE_URL:
+                    // Prevent update imagem until image was not completed uploaded
+                    var imageSrc = data[field.name];
+                    if ((imageSrc) && (!imageSrc.includes("fakepath"))) {
+                        tableRow.find('td.' + field.name + " img").attr("src", imageSrc);
+                    }
+                    break;
+                default:
+                    var value = (field.options && field.options.truncate) ?
+                    data[field.name].substring(0, field.options.truncate) + "..." : data[field.name];
+
+                    tableRow.find('td.' + field.name).text(value);
+                    break;
+            }
+
+        });
+    }
+
+    /**
+     *
+     * Remove a row in the data model table
+     *
+     * @param key of the row/data
+     */
+    function removeTableRow(key) {
+        var tableRow = $("td." + config.fieldId).filter(function () {
+            return $(this).text() == key;
+        }).closest("tr");
+
+        // TODO Move to CSS
+        tableRow.css("background-color", "#FF3700");
+        tableRow.fadeOut(400, function () {
+            tableRow.remove();
+        });
+    }
+
+    /**
+     * Create a form in a modal to create/update data model
+     *
+     * @returns {string} HTML modal form
+     */
+    function createModalForm() {
+        var html = "<div id='" + createIdName("modal-form") + "' class='modal modal-fixed-footer'>" +
+            "<div class='modal-content'>" +
+            "<h4>" + config.model.capitalizeFirstLetter() + "</h4><form id='" + createIdName("form") + "'><fieldset>" +
+            "<input type='hidden' id='" + createIdName(config.fieldId) + "'/>";
+
+        config.fields.forEach(function (field) {
+            switch (field.type) {
+                case FieldType.IMAGE:
+                    // Add a thumb image
+                    // TODO
+                    // if (getValue(field, data) != "") {
+                    //     html += "<img class='form-image' src='" + getValue(field.name, data) + "' " +
+                    //         "width='" + field.options.size + "px' height='" + field.options.size + "px' />";
+                    // }
+                    html += "<span class='form-file'>" +
+                        "<label for='" + createIdName(field.name) + "'>" + field.name + ":</label>" +
+                        "<input type='file' id='" + createIdName(field.name) + "' " +
+                        "placeholder='" + field.name + "' class='text ui-widget-content ui-corner-all'/>" +
+                        "</span>";
+                    break;
+                case FieldType.TEXTAREA:
+                    html += "<div class='input-field'>" +
+                        "<label for='" + createIdName(field.name) + "'>" + field.name + ":</label>" +
+                        "<textarea id='" + createIdName(field.name) + "' " +
+                        "class='materialize-textarea' rows='" + field.options.cols + "'></textarea>" +
+                        "</div>";
+                    break;
+                default:
+                    html += "<div class='input-field'>" +
+                        "<label for='" + createIdName(field.name) + "'>" + field.name + ":</label>" +
+                        "<input type='text' id='" + createIdName(field.name) + "' />" +
+                        "</div>";
+                    break;
+            }
+        });
+        html += "</fieldset>" +
+            "</form>" +
+            "</div>" +
+            "<div class='modal-footer'>" +
+            "<a href='#!' class='modal-action modal-close waves-effect waves-green btn-flat'>Cancel</a>" +
+            "<a href='#!' id='" + createIdName('item-save') +  "' class='modal-action waves-effect waves-green btn-flat'>Save</a>" +
+            "</div>" +
+            "</div>";
+
+        return html;
+    }
+
+
+    /**
+     * Open a model window with the dinamic form created with createFormHtml
+     *
+     * @param data model data
+     */
+    function openModalForm(data) {
+        config.fields.forEach(function (field) {
+            var formField = $("#" + createIdName("form")).find("#" + createIdName(field.name));
+            var value = (data && data[field.name]) ? data[field.name] : "";
+            formField.val(value);
+            if(field.type == FieldType.TEXTAREA) {
+                formField.trigger('autoresize');
+            }
+        });
+
+        Materialize.updateTextFields();
+
+        $("#" + createIdName('modal-form')).modal({
+            ready: function(modal, trigger) {
+                $('#' + createIdName("form") + ' :input:enabled:visible:first').focus();
+            },
+        });
+
+        $("#" + createIdName('modal-form')).modal('open');
+    }
+
+    /**
      * Save a new model data in Firebase database
      */
     function saveData(form) {
 
-        var data = JsonDataFromForm(form);
+        var data = parseDataModelFromForm(form);
 
         var key = (!data[config.fieldId]) ? config.databaseRef.push().key : data[config.fieldId];
 
@@ -383,14 +451,14 @@ function configure(config) {
         // Update all image fields to Firebase storage
         config.fields.forEach(function (field) {
             if (field.type == FieldType.IMAGE) {
-                var fileButton = $(form).find("#" + config.model + "-" + field.name);
+                var fileButton = $(form).find("#" + createIdName(field.name));
 
                 if (fileButton.val() != "") {
                     var file = fileButton[0].files[0];
-                    // key/model-fielname.file_exetension
-                    var fileName = key + "/" + config.model + "-" + field.name + "." + file.name.split('.').pop();
+                    // key/model-fieldname.file_exetension
+                    var absolutePath = key + "/" + createIdName(field.name) + "." + file.name.split('.').pop();
 
-                    uploadImage(file, fileName, function (fileUrl) {
+                    uploadImage(file, absolutePath, function (fileUrl) {
                         data[field.name] = fileUrl;
                         config.databaseRef.child(key).set(data);
                     });
@@ -410,7 +478,7 @@ function configure(config) {
      *
      * @param id Id of the data/file folder
      */
-    function remove(id) {
+    function removeData(id) {
         config.databaseRef.child(id).remove();
         /**
          * There is not way to delete a folder from Firebase API
@@ -423,11 +491,12 @@ function configure(config) {
      * Upload file (image) to the Firebase Storage
      *
      * @param file Local file path
-     * @param fileName Remove file path + name
+     * @param absolutePath absolute file path (folder + file name)
+     * @param callback Callback function called when successfully uploaded
      */
-    function uploadImage(file, fileName, callback) {
+    function uploadImage(file, absolutePath, callback) {
         if (file) {
-            var uploadTask = config.storageRef.child(fileName).put(file);
+            var uploadTask = config.storageRef.child(absolutePath).put(file);
             uploadTask.on('state_changed', function (snapshot) {
             }, function (error) {
                 // TODO Display error!
@@ -435,7 +504,6 @@ function configure(config) {
                 callback(uploadTask.snapshot.downloadURL);
             });
         }
-
     }
 
 }
