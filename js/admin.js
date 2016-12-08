@@ -123,7 +123,7 @@ function configure(config) {
             // Add item id in the data to pass to edit form
             itemSelected[config.fieldId] = key;
 
-            openModalForm(itemSelected);
+            openModalForm(key, itemSelected);
         })
         .on("click", "." + createIdName("item-remove"), function (event) {
             event.preventDefault();
@@ -415,7 +415,10 @@ function configure(config) {
      *
      * @param data model data
      */
-    function openModalForm(data) {
+    function openModalForm(key, data) {
+        // Put key temporarily in the data to use in the form
+        $("#" + createIdName("form")).find("#" + createIdName(config.fieldId)).val(key);
+
         config.fields.forEach(function (field) {
             var formField = $("#" + createIdName("form")).find("#" + createIdName(field.name));
             var value = (data && data[field.name]) ? data[field.name] : "";
