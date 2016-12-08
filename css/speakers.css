@@ -1,18 +1,12 @@
 .speakers-container.speakers-page {
-    display: flex;
-    flex-flow: column wrap;
-}
-
-@media (min-width: 601px) {
-    .speakers-container.speakers-page {
-        display: flex;
-        flex-direction: row;
-    }
+    display: inline-block;
 }
 
 .speaker.speakers-page {
     width: 100%;
     margin: 8px;
+    vertical-align: top;
+    min-width: 300px;
 }
 @media (min-width: 602px) {
     .speaker.speakers-page {
@@ -46,7 +40,6 @@
 }
 
 .speaker.speakers-page.card > .card-content {
-    height: 200px;
     color: #212121;
     font-weight: 400;
     text-align: justify;
