@@ -283,7 +283,7 @@ function configure(config) {
                         "</td>";
                     break;
                 default:
-                    var value = (field.options && field.options.truncate) ? data[field.name].substring(0, field.options.truncate) + "..." : data[field.name];
+                    var value = (field.options && field.options.truncate && data[field.name].length > field.options.truncate) ? data[field.name].substring(0, field.options.truncate) + "..." : data[field.name];
                     html += "<td class='" + field.name + " mdl-data-table__cell--non-numeric'>" + value + "</td>";
                     break;
             }
