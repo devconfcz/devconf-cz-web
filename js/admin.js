@@ -23,7 +23,7 @@ $(function () {
     $('ul.tabs').tabs('select_tab', firstTabName);
 });
 
-String.prototype.capitalizeFirstLetter = function() {
+String.prototype.capitalizeFirstLetter = function () {
     return this.charAt(0).toUpperCase() + this.slice(1);
 };
 
@@ -402,7 +402,7 @@ function configure(config) {
             "</div>" +
             "<div class='modal-footer'>" +
             "<a href='#!' class='modal-action modal-close waves-effect waves-green btn-flat'>Cancel</a>" +
-            "<a href='#!' id='" + createIdName('item-save') +  "' class='modal-action waves-effect waves-green btn-flat'>Save</a>" +
+            "<a href='#!' id='" + createIdName('item-save') + "' class='modal-action waves-effect waves-green btn-flat'>Save</a>" +
             "</div>" +
             "</div>";
 
@@ -423,7 +423,7 @@ function configure(config) {
             var formField = $("#" + createIdName("form")).find("#" + createIdName(field.name));
             var value = (data && data[field.name]) ? data[field.name] : "";
             formField.val(value);
-            if(field.type == FieldType.TEXTAREA) {
+            if (field.type == FieldType.TEXTAREA) {
                 formField.trigger('autoresize');
             }
         });
@@ -431,7 +431,7 @@ function configure(config) {
         Materialize.updateTextFields();
 
         $("#" + createIdName('modal-form')).modal({
-            ready: function(modal, trigger) {
+            ready: function (modal, trigger) {
                 $('#' + createIdName("form") + ' :input:enabled:visible:first').focus();
             },
         });
@@ -472,7 +472,11 @@ function configure(config) {
             }
         });
 
-        config.databaseRef.child(key).set(data);
+        config.databaseRef.child(key).set(data, function(error) {
+            if (error) {
+                alert("Data could not be saved." + error);
+            }
+        });
 
     }
 
@@ -482,7 +486,13 @@ function configure(config) {
      * @param id Id of the data/file folder
      */
     function removeData(id) {
-        config.databaseRef.child(id).remove();
+        config.databaseRef.child(id).remove(function (error) {
+            if (error) {
+                alert("Data could not be saved." + error);
+            } else {
+                alert('yay');
+            }
+        });
         /**
          * There is not way to delete a folder from Firebase API
          * See: https://groups.google.com/forum/#!topic/firebase-talk/aG7GSR7kVtw
