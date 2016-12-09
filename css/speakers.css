@@ -7,21 +7,21 @@ body, html{
 }
 
 .speaker.speakers-page {
-    width: 100%;
+    width: 97%;
     margin: 8px;
     vertical-align: top;
     min-width: 300px;
     display: inline-block;
     cursor: pointer;
 }
-@media (min-width: 602px) {
+@media (min-width: 745px) {
     .speaker.speakers-page {
         margin: 8px;
         width: calc(100% / 2 - 2 * 8px);
     }
 }
 
-@media (min-width: 961px) {
+@media (min-width: 1360px) {
     .speaker.speakers-page {
         width: calc(100% / 3 - 2 * 8px);
     }
