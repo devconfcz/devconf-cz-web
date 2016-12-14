@@ -18,6 +18,28 @@ $(function () {
         storageRef: firebase.storage().ref("speakers")
     });
 
+    var session = configure({
+        model: "session",
+        fieldId: "key",
+        fields: [
+            new FieldOption(FieldType.TEXT, "title"),
+            new FieldOption(FieldType.TEXT, "speakers"),
+            new FieldOption(FieldType.TEXT, "track"),
+            new FieldOption(FieldType.TEXT, "room"),
+            new FieldOption(FieldType.TEXT, "day"),
+            new FieldOption(FieldType.TEXT, "start"),
+            new FieldOption(FieldType.TEXT, "end")
+            // new FieldOption(FieldType.TEXT, "duration"),
+            // new FieldOption(FieldType.TEXT, "session"),
+            // new FieldOption(FieldType.TEXT, "qa"),
+            // new FieldOption(FieldType.TEXT, "status")
+        ],
+        data: {},
+        databaseRef: firebase.database().ref().child("sessions"),
+        databaseOrder: "day",
+        storageRef: firebase.storage().ref("sessions")
+    });
+
     // Force select the first tab
     var firstTabName = $("ul.tabs li.tab:first a").attr('href').substring(1);
     $('ul.tabs').tabs('select_tab', firstTabName);
