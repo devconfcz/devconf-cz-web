@@ -1,27 +1,40 @@
-body, html{
+/**********************************************************************************************************************
+ * GLOBAL
+ *********************************************************************************************************************/
+
+body, html {
     background: #EEE;
 }
+
+.container {
+    width: 90%;
+}
+
+/**********************************************************************************************************************
+ * SPEAKERS
+ *********************************************************************************************************************/
 
 .speakers-container {
     display: inline-block;
 }
 
 .speaker {
-    width: 97%;
     margin: 8px;
     vertical-align: top;
+    width: 98%;
     min-width: 300px;
     display: inline-block;
     cursor: pointer;
 }
-@media (min-width: 745px) {
+
+@media (min-width: 703px) {
     .speaker {
         margin: 8px;
         width: calc(100% / 2 - 2 * 8px);
     }
 }
 
-@media (min-width: 1360px) {
+@media (min-width: 1054px) {
     .speaker {
         width: calc(100% / 3 - 2 * 8px);
     }
@@ -56,3 +69,4 @@ body, html{
 .speaker.card > .card-action {
     padding: 10px 10px 5px 10px;
 }
+

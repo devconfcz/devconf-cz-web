@@ -1,6 +1,7 @@
 $(function () {
     initializeFirebase();
     speakers();
+    sessions();
 });
 
 function initializeFirebase() {
@@ -21,16 +22,15 @@ function speakers() {
 
     // -- HTML Triggers -----------------------------------------------------------------------------------------------
 
-
     $("body")
-        // Show/Hide speaker bio when click on speaker photo
-        .on("click", ".card-image", function (event) {
+    // Show/Hide speaker bio when click on speaker photo
+        .on("click", ".speaker .card-image", function (event) {
             event.stopImmediatePropagation();
 
             $(this).parent().find('.card-content').slideToggle();
         })
         // Hide speaker bio when click on speaker bio
-        .on("click", ".card-content", function (event) {
+        .on("click", ".speaker .card-content", function (event) {
             event.stopImmediatePropagation();
 
             $(this).slideToggle();
@@ -40,7 +40,7 @@ function speakers() {
 
     var speakersRef = firebase.database().ref().child("speakers");
 
-    speakersRef.orderByChild("name").on('child_added', function _add(snapshot) {
+    speakersRef.orderByChild("name").on('child_added', function (snapshot) {
         addNewSpeakerCard(snapshot.val(), snapshot.key);
     });
 
