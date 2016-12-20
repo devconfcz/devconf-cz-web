@@ -68,3 +68,96 @@ function speakers() {
 
 }
 
+// -- Sessions --------------------------------------------------------------------------------------------------------
+
+function sessions() {
+
+    // -- HTML Triggers -----------------------------------------------------------------------------------------------
+
+    // -- Firebase Database Triggers ----------------------------------------------------------------------------------
+
+    var sessionsRef = firebase.database().ref().child("sessions").orderByChild("start");
+
+    sessionsRef.on('child_added', function (snapshot) {
+        addSession(snapshot.val());
+    });
+
+    // -- Helper methods ----------------------------------------------------------------------------------------------
+
+    function addSession(session) {
+        if(session.track.toLowerCase() != "workshop") {
+
+        var sessionDay = session.day;
+        var sessionHour = session.start.replace(/\s+/g, '-').replace(/:/g, '-');
+
+        if (!existsScheduleDay(sessionDay)) {
+            createScheduleDay(sessionDay);
+        }
+
+        if (!existsTimeslotInScheduleDay(sessionDay, sessionHour)) {
+            createTimeslotFor(sessionDay, sessionHour);
+        }
+
+        var html = "<div id='" + session.id + "' class='session card hoverable " + session.track + "'>" +
+            "<div class='card-content'>" +
+            "<span class='card-title'>" + session.title + "</span>" +
+            "<div class='info'>" +
+            "<div class='room'><i class='tiny material-icons'>room</i> " + session.room + "</div>" +
+            "<div class='track'><i class='tiny material-icons'>local_offer</i> " + session.track + "</div>" +
+            "</div>" +
+            "</div>" +
+            "<div class='card-action'>" +
+            "<div class='speakers'>" +
+            "<div class='speaker'><i class='tiny material-icons'>person</i>Daniel Passos</div>" +
+            "<div class='speaker'><i class='tiny material-icons'>person</i>Karel Piwko</div>" +
+            "</div>" +
+            "</div>";
+
+            findSessionWrapper(sessionDay, sessionHour).append(html);
+        }
+    }
+
+    function findScheduleDay(day) {
+        return $("schedule-day[name='day" + day + "']")
+    }
+
+    function existsScheduleDay(day) {
+        return findScheduleDay(day).length;
+    }
+
+    function createScheduleDay(sessionDay) {
+        var html = "<schedule-day name='day" + sessionDay + "'>";
+        $(".container.session-container").append(html);
+    }
+
+    function findTimeSlot(day, timeslot) {
+        return findScheduleDay(day).find(".timeslot." + timeslot);
+    }
+
+    function existsTimeslotInScheduleDay(day, timeslot) {
+        return findTimeSlot(day, timeslot).length;
+    }
+
+    function createTimeslotFor(day, timeslot) {
+        var hour = timeslot.split("-")[0];
+        var minute = timeslot.split("-")[1];
+        var meridiem = "AM";
+
+        var html = "<div class='" + timeslot + " timeslot'>" +
+            "<div class='start-time'>" +
+            "<span class='hours'>" + hour + "</span>" +
+            "<span class='minutes'>" + minute + "</span>" +
+            "</div>" +
+            "<div class='sessions-wrapper'>" +
+            "</div>" +
+            "</div>";
+
+        findScheduleDay(day).append(html);
+    }
+
+    function findSessionWrapper(day, hour) {
+        return findTimeSlot(day, hour).find(".sessions-wrapper");
+    }
+
+}
+
