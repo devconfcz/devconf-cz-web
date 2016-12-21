@@ -18,7 +18,7 @@ body, html {
     display: inline-block;
 }
 
-.speakers-container > .speaker.card {
+.card--speaker {
     margin: 8px;
     vertical-align: top;
     width: 95%;
@@ -28,19 +28,19 @@ body, html {
 }
 
 @media (min-width: 703px) {
-    .speakers-container > .speaker.card {
+    .card--speaker {
         margin: 8px;
         width: calc(100% / 2 - 2 * 8px);
     }
 }
 
 @media (min-width: 1054px) {
-    .speakers-container > .speaker.card {
+    .card--speaker {
         width: calc(100% / 3 - 2 * 8px);
     }
 }
 
-.speakers-container > .speaker.card > .card-image {
+.card .card-image--speaker {
     color: #fff;
     height: 250px;
     background-size: cover;
@@ -49,7 +49,7 @@ body, html {
     background-image: url('/assets/imgs/person-placeholder.jpg');
 }
 
-.speakers-container > .speaker.card > .card-image > .card-title {
+.card .card-image .card-title--speaker {
     font-size: 36px;
     font-weight: bold;
     text-shadow: 1px 1px 3px black;
@@ -58,7 +58,7 @@ body, html {
     line-height: 1.2;
 }
 
-.speakers-container > .speaker.card > .card-content {
+.card .card-content--speaker {
     color: #212121;
     font-weight: 400;
     text-align: justify;
@@ -66,7 +66,7 @@ body, html {
     display: none;
 }
 
-.speakers-container > .speaker.card > .card-action {
+.card .card-action--speaker {
     padding: 10px 10px 5px 10px;
 }
 
@@ -74,49 +74,45 @@ body, html {
  * SESSIONS
  *********************************************************************************************************************/
 
-.session-container > schedule-day > .timeslot,
-.session-container > schedule-day > .timeslot > .sessions-wrapper,
-.session-container > schedule-day > .timeslot > .sessions-wrapper > .session {
+.timeslot,
+.sessions-wrapper,
+.session {
     display: flex;
     flex-direction: column;
 }
 
-.session-container > schedule-day > .timeslot > .sessions-wrapper {
+.sessions-wrapper {
     flex: 1 1 auto;
 }
 
-.session-container > schedule-day > .timeslot > .sessions-wrapper > .session {
-    flex: 1 1 1e-9px;
-}
-
 @media (min-width: 1200px) {
-    .session-container > schedule-day > .timeslot,
-    .session-container > schedule-day > .timeslot > .sessions-wrapper {
+    .timeslot,
+    .sessions-wrapper {
         flex-direction: row;
     }
 }
 
-.session-container > schedule-day > .timeslot {
+.timeslot {
     margin-top: 40px;
 }
 
-.session-container > schedule-day > .timeslot:last-of-type {
+.timeslot:last-of-type {
     margin-bottom: 50px;
 }
 
-.session-container > schedule-day > .timeslot > .start-time {
+.session-time {
     color: #727272;
     min-width: 110px;
     padding-left: 24px;
 }
 
-.session-container > schedule-day > .timeslot > .start-time > .hours {
+.session-hour {
     font-size: 56px;
     font-weight: 300;
     letter-spacing: -0.04em;
 }
 
-.session-container > schedule-day > .timeslot > .start-time > .minutes {
+.session-minute {
     font-size: 16px;
     margin-left: 3px;
 }
@@ -125,6 +121,7 @@ body, html {
     padding: 10px 5px 5px 10px;
     margin: 2px;
     min-height: 200px;
+    flex: 1 1 1e-9px;
 }
 
 @media (min-width: 600px) {
@@ -133,30 +130,30 @@ body, html {
     }
 }
 
-.session-container > schedule-day > .timeslot > .sessions-wrapper > .session > .card-content {
+.card .card-content--session {
     padding: 2px;
 }
 
-.session-container > schedule-day > .timeslot > .sessions-wrapper > .session > .card-content > .card-title {
+.card .card-content .card-title--session {
     font-size: 18px;
     line-height: 1.6;
 }
 
-.session-container > schedule-day > .timeslot > .sessions-wrapper > .session > .card-action {
+.card .card-action--session {
     padding: 2px;
 }
 
-.session-container > schedule-day > .timeslot > .sessions-wrapper > .session > .card-action > .speakers {
+.session-speakers {
     font-size: 12px;
     line-height: normal;
 }
 
-.session-container > schedule-day > .timeslot > .sessions-wrapper > .session > .card-content > .info {
+.session-info {
     margin-top: 5px;
     margin-bottom: 5px;
 }
 
-.session-container > schedule-day > .timeslot > .sessions-wrapper > .session > .card-content > .info > .room, .session > .card-content > .info > .track {
+.session-room, .session-track {
     font-size: 10px;
     font-weight: 300;
     line-height: normal;

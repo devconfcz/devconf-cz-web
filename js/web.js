@@ -24,13 +24,13 @@ function speakers() {
 
     $("body")
     // Show/Hide speaker bio when click on speaker photo
-        .on("click", ".speaker .card-image", function (event) {
+        .on("click", ".card-image--speaker", function (event) {
             event.stopImmediatePropagation();
 
-            $(this).parent().find('.card-content').slideToggle();
+            $(this).parent().find('.card-content--speaker').slideToggle();
         })
         // Hide speaker bio when click on speaker bio
-        .on("click", ".speaker .card-content", function (event) {
+        .on("click", ".card-content--speaker", function (event) {
             event.stopImmediatePropagation();
 
             $(this).slideToggle();
@@ -47,15 +47,15 @@ function speakers() {
     // -- Helper methods ----------------------------------------------------------------------------------------------
 
     function addNewSpeakerCard(speaker, id) {
-        var html = "<div class='speaker card hoverable " + id + "'>" +
-            "<div class='card-image' style='background-image: url(\"" + speaker.avatar + "\")'>" +
-            "<span class='card-title'>" + speaker.name + "</span>" +
+        var html = "<div class='card card--speaker hoverable " + id + "'>" +
+            "<div class='card-image card-image--speaker' style='background-image: url(\"" + speaker.avatar + "\")'>" +
+            "<span class='card-title card-title--speaker'>" + speaker.name + "</span>" +
             "</div>" +
-            "<div class='card-content'>" +
+            "<div class='card-content card-content--speaker'>" +
             speaker.bio +
             "</div>";
         // Card Actions
-        // html += "<div class='card-action'>";
+        // html += "<div class='card-action card-action--speaker'>";
         // if (speaker.twitter) {
         //     html += "<a href='http://twitter.com/" + speaker.twitter + "'>" +
         //         "<img src='assets/icons/twitter-icon.png' width='40px' height='40px' />" +
@@ -99,17 +99,17 @@ function sessions() {
         }
 
         var html = "<div id='" + session.id + "' class='session card hoverable " + session.track + "'>" +
-            "<div class='card-content'>" +
-            "<span class='card-title'>" + session.title + "</span>" +
-            "<div class='info'>" +
-            "<div class='room'><i class='tiny material-icons'>room</i> " + session.room + "</div>" +
-            "<div class='track'><i class='tiny material-icons'>local_offer</i> " + session.track + "</div>" +
+            "<div class='card-content card-content--session'>" +
+            "<span class='card-title card-title--session'>" + session.title + "</span>" +
+            "<div class='session-info'>" +
+            "<div class='session-room'><i class='tiny material-icons'>room</i>" + session.room + "</div>" +
+            "<div class='session-track'><i class='tiny material-icons'>local_offer</i>" + session.track + "</div>" +
             "</div>" +
             "</div>" +
-            "<div class='card-action'>" +
-            "<div class='speakers'>" +
-            "<div class='speaker'><i class='tiny material-icons'>person</i>Daniel Passos</div>" +
-            "<div class='speaker'><i class='tiny material-icons'>person</i>Karel Piwko</div>" +
+            "<div class='card-action card-action--session'>" +
+            "<div class='session-speakers'>" +
+            "<div class='session-speaker'><i class='tiny material-icons'>person</i>Daniel Passos</div>" +
+            "<div class='session-speaker'><i class='tiny material-icons'>person</i>Karel Piwko</div>" +
             "</div>" +
             "</div>";
 
@@ -118,7 +118,7 @@ function sessions() {
     }
 
     function findScheduleDay(day) {
-        return $("schedule-day[name='day" + day + "']")
+        return $("div .schedule-day.day" + day);
     }
 
     function existsScheduleDay(day) {
@@ -126,7 +126,7 @@ function sessions() {
     }
 
     function createScheduleDay(sessionDay) {
-        var html = "<schedule-day name='day" + sessionDay + "'>";
+        var html = "<div class='schedule-day day" + sessionDay + "'>";
         $(".container.session-container").append(html);
     }
 
@@ -144,9 +144,9 @@ function sessions() {
         var meridiem = "AM";
 
         var html = "<div class='" + timeslot + " timeslot'>" +
-            "<div class='start-time'>" +
-            "<span class='hours'>" + hour + "</span>" +
-            "<span class='minutes'>" + minute + "</span>" +
+            "<div class='session-time'>" +
+            "<span class='session-hour'>" + hour + "</span>" +
+            "<span class='session-minute'>" + minute + "</span>" +
             "</div>" +
             "<div class='sessions-wrapper'>" +
             "</div>" +
