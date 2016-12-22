@@ -3,11 +3,13 @@
 <head>
     <script type="text/javascript" src="https://www.gstatic.com/firebasejs/3.6.0/firebase.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
     <script type="text/javascript" src="js/web.js"></script>
 
     <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+    <link type="text/css" rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
     <link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
     <link type="text/css" rel="stylesheet" href="css/web.css">
 
@@ -17,7 +19,64 @@
 </head>
 
 <body>
-<div class="container session-container">
+<div class="container">
+
+    <div class="row">
+        <div class="col s12">
+            <ul class="tabs">
+                <li class="tab"><a href="#day1">Day 1</a></li>
+                <li class="tab"><a href="#day2">Day 2</a></li>
+                <li class="tab"><a href="#day3">Day 3</a></li>
+            </ul>
+        </div>
+        <div id="day1" class="col s12">
+            <table class="responsive-table bordered striped day1">
+                <thead>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <div id="day2" class="col s12">
+            <table class="responsive-table bordered striped day2">
+                <thead>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <div id="day3" class="col s12">
+            <table class="responsive-table bordered striped day3">
+                <thead>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="session-detail" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <h5></h5>
+            <div class="session-info hide-on-med-and-down">
+                <i class="tiny material-icons">place</i><span class="session-room"></span>
+                <i class="tiny material-icons">local_offer</i><span class="session-track"></span>
+                <i class="tiny material-icons">person</i><span class="session-speakers"></span>
+            </div>
+            <div class="session-info hide-on-large-only">
+                <i class="tiny material-icons">place</i><span class="session-room"></span>
+                <i class="tiny material-icons">local_offer</i><span class="session-track"></span>
+                <div>
+                    <i class="tiny material-icons">person</i><span class="session-speakers"></span>
+                </div>
+            </div>
+            <div class="session-description"></div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+        </div>
+    </div>
+
 </div>
 </body>
 </html>

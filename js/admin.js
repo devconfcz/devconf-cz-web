@@ -23,16 +23,13 @@ $(function () {
         fieldId: "key",
         fields: [
             new FieldOption(FieldType.TEXT, "title"),
-            new FieldOption(FieldType.TEXT, "speakers"),
             new FieldOption(FieldType.TEXT, "track"),
+            new FieldOption(FieldType.TEXT, "difficulty"),
             new FieldOption(FieldType.TEXT, "room"),
             new FieldOption(FieldType.TEXT, "day"),
             new FieldOption(FieldType.TEXT, "start"),
-            new FieldOption(FieldType.TEXT, "end")
-            // new FieldOption(FieldType.TEXT, "duration"),
-            // new FieldOption(FieldType.TEXT, "session"),
-            // new FieldOption(FieldType.TEXT, "qa"),
-            // new FieldOption(FieldType.TEXT, "status")
+            new FieldOption(FieldType.TEXT, "duration"),
+            new FieldOption(FieldType.TEXTAREA, "description", {cols: 10, truncate: 40})
         ],
         data: {},
         databaseRef: firebase.database().ref().child("sessions"),
@@ -455,7 +452,7 @@ function configure(config) {
         $("#" + createIdName('modal-form')).modal({
             ready: function (modal, trigger) {
                 $('#' + createIdName("form") + ' :input:enabled:visible:first').focus();
-            },
+            }
         });
 
         $("#" + createIdName('modal-form')).modal('open');

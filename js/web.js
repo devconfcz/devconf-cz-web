@@ -1,7 +1,7 @@
 $(function () {
     initializeFirebase();
     speakers();
-    sessions();
+    session();
 });
 
 function initializeFirebase() {
@@ -68,96 +68,141 @@ function speakers() {
 
 }
 
-// -- Sessions --------------------------------------------------------------------------------------------------------
+function session() {
 
-function sessions() {
+    // Init -----------------------------------------------------------------------------------------------------------
+
+    // Local cache of all sessions
+    var sessions = [];
+    var speakers = [];
+
+    // All available rooms
+    var rooms = ["D105", "D205", "D206", "C228", "E105", "E112", "E104", "G202"];
+
+    // http://materializecss.com/modals.html#initialization
+    $('.modal').modal();
+
+    createTableHeader(rooms);
 
     // -- HTML Triggers -----------------------------------------------------------------------------------------------
+
+    $("body")
+        .on("click", ".session", function (event) {
+            event.stopImmediatePropagation();
+            var sessionId = $(this).attr("id");
+            if (sessionId) {
+                showSessionModal(sessions[sessionId]);
+            }
+        });
 
     // -- Firebase Database Triggers ----------------------------------------------------------------------------------
 
     var sessionsRef = firebase.database().ref().child("sessions").orderByChild("start");
+    var speakersRef = firebase.database().ref().child("speakers").orderByChild("name");
 
-    sessionsRef.on('child_added', function (snapshot) {
-        addSession(snapshot.val());
+    speakersRef.once('value', function (snapshot) {
+        snapshot.forEach(function (childSnapshot) {
+            var speaker = childSnapshot.val();
+            speakers[speaker.id] = speaker;
+        });
+    });
+
+    sessionsRef.once('value', function (snapshot) {
+        snapshot.forEach(function (childSnapshot) {
+            var session = childSnapshot.val();
+            sessions[session.id] = session;
+            addSessionInTable(session);
+        });
     });
 
     // -- Helper methods ----------------------------------------------------------------------------------------------
 
-    function addSession(session) {
-        if(session.track.toLowerCase() != "workshop") {
+    /**
+     * Create table header based in available rooms
+     *
+     * @param rooms Available rooms
+     */
+    function createTableHeader(rooms) {
+        var html = "<tr><th></th>";
+        rooms.forEach(function (room) {
+            html += "<th>" + room + "</th>";
+        });
 
-        var sessionDay = session.day;
-        var sessionHour = session.start.replace(/\s+/g, '-').replace(/:/g, '-');
+        $("table.day1 > thead").append(html);
+        $("table.day2 > thead").append(html);
+        $("table.day3 > thead").append(html);
+    }
 
-        if (!existsScheduleDay(sessionDay)) {
-            createScheduleDay(sessionDay);
+    /**
+     * Add the session in the table cell
+     *
+     * @param session Session
+     */
+    function addSessionInTable(session) {
+
+        if (session.type.toLowerCase() == "talk") {
+
+            var timeslot = session.start.replace(/\s+/g, '-').replace(/:/g, '-');
+            var hour = timeslot.split("-")[0];
+            var minute = timeslot.split("-")[1];
+
+            if (!$("tr." + timeslot).length) {
+                var html = "<tr class='" + timeslot + "'>" +
+                    "<td class='session-time'>" +
+                    "<span class='session-hour'>" + hour + "</span>" +
+                    "<span class='session-minute'>" + minute + "</span>" +
+                    "</td>";
+
+                rooms.forEach(function (room) {
+                    html += "<td class='session hoverable'></td>"
+                });
+                html += "</tr>";
+                $("table.day" + session.day + " > tbody:last-child").append(html);
+            }
+
+            var tdIndex = rooms.indexOf(session.room.toUpperCase()) + 2;
+            var html = "<div class='session-title'>" + session.title + "</div>" +
+                "<div class='hide-on-med-and-down session-track'><i class='tiny material-icons'>local_offer</i>" + session.track + "</div>";
+            var td = $("table.day" + session.day + " tr." + timeslot).find("td:nth-child(" + tdIndex + ")");
+            td.attr("id", session.id);
+            td.html(html);
+
         }
 
-        if (!existsTimeslotInScheduleDay(sessionDay, sessionHour)) {
-            createTimeslotFor(sessionDay, sessionHour);
+    }
+
+    /**
+     * Show the session detail
+     *
+     * @param session Session
+     */
+    function showSessionModal(session) {
+
+        var modal = $("#session-detail");
+        var content = modal.find(".modal-content");
+        var footer = modal.find(".modal-footer");
+
+        content.find("h5").text(session.title);
+        content.find(".session-description").html(session.description);
+        content.find(".session-speakers").empty();
+        content.find(".session-speakers").append(getSpeakers(session.speakers));
+        content.find(".session-info .session-track").text(session.track);
+        content.find(".session-info .session-room").text(session.room);
+
+        modal.modal('open');
+
+    }
+
+    function getSpeakers(speakersId) {
+        var s = "";
+        for (i = 0; i < speakersId.length; i++) {
+            var speaker = speakers[speakersId[i]];
+            s += speaker.name;
+            if (speakersId.length - 1 > i) {
+                s += " & ";
+            }
         }
-
-        var html = "<div id='" + session.id + "' class='session card hoverable " + session.track + "'>" +
-            "<div class='card-content card-content--session'>" +
-            "<span class='card-title card-title--session'>" + session.title + "</span>" +
-            "<div class='session-info'>" +
-            "<div class='session-room'><i class='tiny material-icons'>room</i>" + session.room + "</div>" +
-            "<div class='session-track'><i class='tiny material-icons'>local_offer</i>" + session.track + "</div>" +
-            "</div>" +
-            "</div>" +
-            "<div class='card-action card-action--session'>" +
-            "<div class='session-speakers'>" +
-            "<div class='session-speaker'><i class='tiny material-icons'>person</i>Daniel Passos</div>" +
-            "<div class='session-speaker'><i class='tiny material-icons'>person</i>Karel Piwko</div>" +
-            "</div>" +
-            "</div>";
-
-            findSessionWrapper(sessionDay, sessionHour).append(html);
-        }
-    }
-
-    function findScheduleDay(day) {
-        return $("div .schedule-day.day" + day);
-    }
-
-    function existsScheduleDay(day) {
-        return findScheduleDay(day).length;
-    }
-
-    function createScheduleDay(sessionDay) {
-        var html = "<div class='schedule-day day" + sessionDay + "'>";
-        $(".container.session-container").append(html);
-    }
-
-    function findTimeSlot(day, timeslot) {
-        return findScheduleDay(day).find(".timeslot." + timeslot);
-    }
-
-    function existsTimeslotInScheduleDay(day, timeslot) {
-        return findTimeSlot(day, timeslot).length;
-    }
-
-    function createTimeslotFor(day, timeslot) {
-        var hour = timeslot.split("-")[0];
-        var minute = timeslot.split("-")[1];
-        var meridiem = "AM";
-
-        var html = "<div class='" + timeslot + " timeslot'>" +
-            "<div class='session-time'>" +
-            "<span class='session-hour'>" + hour + "</span>" +
-            "<span class='session-minute'>" + minute + "</span>" +
-            "</div>" +
-            "<div class='sessions-wrapper'>" +
-            "</div>" +
-            "</div>";
-
-        findScheduleDay(day).append(html);
-    }
-
-    function findSessionWrapper(day, hour) {
-        return findTimeSlot(day, hour).find(".sessions-wrapper");
+        return s;
     }
 
 }
-
