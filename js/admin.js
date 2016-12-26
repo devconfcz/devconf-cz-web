@@ -507,9 +507,7 @@ function configure(config) {
     function removeData(id) {
         config.databaseRef.child(id).remove(function (error) {
             if (error) {
-                alert("Data could not be saved." + error);
-            } else {
-                alert('yay');
+                alert("Data could not be removed." + error);
             }
         });
         /**

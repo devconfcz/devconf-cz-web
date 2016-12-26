@@ -1,7 +1,6 @@
 $(function () {
     initializeFirebase();
-    speakers();
-    session();
+    sessions();
 });
 
 function initializeFirebase() {
@@ -16,59 +15,7 @@ function initializeFirebase() {
     firebase.initializeApp(config);
 }
 
-// -- Speakers --------------------------------------------------------------------------------------------------------
-
-function speakers() {
-
-    // -- HTML Triggers -----------------------------------------------------------------------------------------------
-
-    $("body")
-    // Show/Hide speaker bio when click on speaker photo
-        .on("click", ".card-image--speaker", function (event) {
-            event.stopImmediatePropagation();
-
-            $(this).parent().find('.card-content--speaker').slideToggle();
-        })
-        // Hide speaker bio when click on speaker bio
-        .on("click", ".card-content--speaker", function (event) {
-            event.stopImmediatePropagation();
-
-            $(this).slideToggle();
-        });
-
-    // -- Firebase Database Triggers ----------------------------------------------------------------------------------
-
-    var speakersRef = firebase.database().ref().child("speakers");
-
-    speakersRef.orderByChild("name").on('child_added', function (snapshot) {
-        addNewSpeakerCard(snapshot.val(), snapshot.key);
-    });
-
-    // -- Helper methods ----------------------------------------------------------------------------------------------
-
-    function addNewSpeakerCard(speaker, id) {
-        var html = "<div class='card card--speaker hoverable " + id + "'>" +
-            "<div class='card-image card-image--speaker' style='background-image: url(\"" + speaker.avatar + "\")'>" +
-            "<span class='card-title card-title--speaker'>" + speaker.name + "</span>" +
-            "</div>" +
-            "<div class='card-content card-content--speaker'>" +
-            speaker.bio +
-            "</div>";
-        // Card Actions
-        // html += "<div class='card-action card-action--speaker'>";
-        // if (speaker.twitter) {
-        //     html += "<a href='http://twitter.com/" + speaker.twitter + "'>" +
-        //         "<img src='assets/icons/twitter-icon.png' width='40px' height='40px' />" +
-        //         "</a>";
-        // }
-        // html += "</div>";
-
-        $('.speakers-container').append(html);
-    }
-
-}
-
-function session() {
+function sessions() {
 
     // Init -----------------------------------------------------------------------------------------------------------
 

@@ -1,0 +1,67 @@
+/**********************************************************************************************************************
+ * GLOBAL
+ *********************************************************************************************************************/
+
+body, html {
+    background: #EEE;
+}
+
+.container {
+    width: 90%;
+}
+
+/**********************************************************************************************************************
+ * SPEAKERS
+ *********************************************************************************************************************/
+
+.speakers-container {
+    display: inline-block;
+}
+
+.card.speaker {
+    margin: 8px;
+    vertical-align: top;
+    width: 95%;
+    min-width: 300px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+@media (min-width: 703px) {
+    .card.speaker {
+        margin: 8px;
+        width: calc(100% / 2 - 2 * 8px);
+    }
+}
+
+@media (min-width: 1054px) {
+    .card.speaker {
+        width: calc(100% / 3 - 2 * 8px);
+    }
+}
+
+.card-image.speaker-image {
+    color: #fff;
+    height: 250px;
+    background-size: cover;
+    background-position: center;
+    border-top: 1px solid rgba(0, 0, 0, .1);
+    background-image: url('/imgs/person-placeholder.jpg');
+}
+
+.card-title.speaker-name {
+    font-size: 36px;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px black;
+    padding: 5px;
+    margin-left: 10px;
+    line-height: 1.2;
+}
+
+.card-content.speaker-bio {
+    color: #212121;
+    font-weight: 400;
+    text-align: justify;
+    font-size: 12px;
+    display: none;
+}
