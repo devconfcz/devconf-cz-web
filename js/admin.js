@@ -1,6 +1,29 @@
 $(function () {
     initializeFirebase();
 
+    var track = configure({
+        model: "track",
+        fieldId: "key",
+        fields: [
+            new FieldOption(FieldType.TEXT, "name"),
+            new FieldOption(FieldType.HEX, "color")
+        ],
+        data: {},
+        databaseRef: firebase.database().ref().child("tracks"),
+        databaseOrder: "name"
+    });
+
+    var room = configure({
+        model: "room",
+        fieldId: "key",
+        fields: [
+            new FieldOption(FieldType.TEXT, "name")
+        ],
+        data: {},
+        databaseRef: firebase.database().ref().child("rooms"),
+        databaseOrder: "name"
+    });
+
     var speaker = configure({
         model: "speaker",
         fieldId: "key",
@@ -51,6 +74,7 @@ Object.defineProperty(FieldType, 'IMAGE', {value: "image"});
 Object.defineProperty(FieldType, 'IMAGE_URL', {value: "image_url"});
 Object.defineProperty(FieldType, 'TEXT', {value: "text"});
 Object.defineProperty(FieldType, 'TEXTAREA', {value: "textarea"});
+Object.defineProperty(FieldType, 'HEX', {value: "hex"});
 
 var FieldOption = function (type, name, options) {
     this.type = type;
@@ -491,7 +515,7 @@ function configure(config) {
             }
         });
 
-        config.databaseRef.child(key).set(data, function(error) {
+        config.databaseRef.child(key).set(data, function (error) {
             if (error) {
                 alert("Data could not be saved." + error);
             }

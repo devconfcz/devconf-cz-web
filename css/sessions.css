@@ -28,6 +28,10 @@ body, html {
     margin-left: 3px;
 }
 
+.session-title, .session-track {
+    color: #FFFFFF;
+}
+
 @media (min-width: 993px) {
     .session-title {
         min-height: 100px;

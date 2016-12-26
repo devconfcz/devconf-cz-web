@@ -17,19 +17,19 @@ function initializeFirebase() {
 
 function sessions() {
 
+    // Global variables -----------------------------------------------------------------------------------------------
+
+    var rooms = {};
+    var tracks = {};
+    var speakers = [];
+    var sessions = [];
+
     // Init -----------------------------------------------------------------------------------------------------------
 
-    // Local cache of all sessions
-    var sessions = [];
-    var speakers = [];
-
-    // All available rooms
-    var rooms = ["D105", "D205", "D206", "C228", "E105", "E112", "E104", "G202"];
+    retrieveRooms();
 
     // http://materializecss.com/modals.html#initialization
     $('.modal').modal();
-
-    createTableHeader(rooms);
 
     // -- HTML Triggers -----------------------------------------------------------------------------------------------
 
@@ -42,42 +42,84 @@ function sessions() {
             }
         });
 
-    // -- Firebase Database Triggers ----------------------------------------------------------------------------------
-
-    var sessionsRef = firebase.database().ref().child("sessions").orderByChild("start");
-    var speakersRef = firebase.database().ref().child("speakers").orderByChild("name");
-
-    speakersRef.once('value', function (snapshot) {
-        snapshot.forEach(function (childSnapshot) {
-            var speaker = childSnapshot.val();
-            speakers[speaker.id] = speaker;
-        });
-    });
-
-    sessionsRef.once('value', function (snapshot) {
-        snapshot.forEach(function (childSnapshot) {
-            var session = childSnapshot.val();
-            sessions[session.id] = session;
-            addSessionInTable(session);
-        });
-    });
-
     // -- Helper methods ----------------------------------------------------------------------------------------------
 
     /**
-     * Create table header based in available rooms
-     *
-     * @param rooms Available rooms
+     * Retrieve all rooms from database
      */
-    function createTableHeader(rooms) {
-        var html = "<tr><th></th>";
-        rooms.forEach(function (room) {
-            html += "<th>" + room + "</th>";
+    function retrieveRooms() {
+        var roomsRef = firebase.database().ref().child("rooms").orderByChild("name");
+
+        roomsRef.once('value', function (snapshot) {
+            snapshot.forEach(function (childSnapshot) {
+                var room = childSnapshot.val();
+                rooms[room.name.toUpperCase()] = room;
+            });
+
+            createTableHeader();
+
+            retrieveTracks();
+            retrieveSpeakers();
+            retrieveSessions();
         });
+    }
+
+    /**
+     * Retrieve all tracks from database
+     */
+    function retrieveTracks() {
+        var tracksRef = firebase.database().ref().child("tracks");
+
+        tracksRef.once('value', function (snapshot) {
+            snapshot.forEach(function (childSnapshot) {
+                var track = childSnapshot.val();
+                tracks[track.name.toUpperCase()] = track;
+            });
+            createTrackFilter();
+        });
+    }
+
+    /**
+     * Retrieve all speakers from databse
+     */
+    function retrieveSpeakers() {
+        var speakersRef = firebase.database().ref().child("speakers").orderByChild("name");
+
+        speakersRef.once('value', function (snapshot) {
+            snapshot.forEach(function (childSnapshot) {
+                var speaker = childSnapshot.val();
+                speakers[speaker.id] = speaker;
+            });
+        });
+    }
+
+    function retrieveSessions() {
+        var sessionsRef = firebase.database().ref().child("sessions").orderByChild("start");
+
+        sessionsRef.once('value', function (snapshot) {
+            snapshot.forEach(function (childSnapshot) {
+                var session = childSnapshot.val();
+                sessions[session.id] = session;
+                addSessionInTable(session);
+            });
+        });
+    }
+
+    /**
+     * Create table header based in available rooms
+     */
+    function createTableHeader() {
+        var html = "<tr><th></th>";
+        for (var key in rooms) {
+            html += "<th>" + rooms[key].name + "</th>";
+        }
 
         $("table.day1 > thead").append(html);
         $("table.day2 > thead").append(html);
         $("table.day3 > thead").append(html);
+    }
+
+    function createTrackFilter() {
     }
 
     /**
@@ -87,6 +129,8 @@ function sessions() {
      */
     function addSessionInTable(session) {
 
+        var html;
+
         if (session.type.toLowerCase() == "talk") {
 
             var timeslot = session.start.replace(/\s+/g, '-').replace(/:/g, '-');
@@ -94,24 +138,32 @@ function sessions() {
             var minute = timeslot.split("-")[1];
 
             if (!$("tr." + timeslot).length) {
-                var html = "<tr class='" + timeslot + "'>" +
+                html = "<tr class='" + timeslot + "'>" +
                     "<td class='session-time'>" +
                     "<span class='session-hour'>" + hour + "</span>" +
                     "<span class='session-minute'>" + minute + "</span>" +
                     "</td>";
 
-                rooms.forEach(function (room) {
-                    html += "<td class='session hoverable'></td>"
-                });
+                for (key in rooms) {
+                    html += "<td class='session hoverable " + rooms[key].name.toUpperCase() + "'></td>"
+                }
                 html += "</tr>";
                 $("table.day" + session.day + " > tbody:last-child").append(html);
             }
 
-            var tdIndex = rooms.indexOf(session.room.toUpperCase()) + 2;
-            var html = "<div class='session-title'>" + session.title + "</div>" +
+            html = "<div class='session-title'>" + session.title + "</div>" +
                 "<div class='hide-on-med-and-down session-track'><i class='tiny material-icons'>local_offer</i>" + session.track + "</div>";
-            var td = $("table.day" + session.day + " tr." + timeslot).find("td:nth-child(" + tdIndex + ")");
+            var td = $("table.day" + session.day + " tr." + timeslot).find("td." + session.room.toUpperCase());
             td.attr("id", session.id);
+
+            // Check if there is track in the session (database have sessions without track)
+            if (session.track) {
+                td.addClass(session.track.toUpperCase());
+                // Check if there is a color for this track in the database
+                if(tracks[session.track.toUpperCase()]) {
+                    td.css("background-color", tracks[session.track.toUpperCase()].color);
+                }
+            }
             td.html(html);
 
         }
