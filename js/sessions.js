@@ -1,6 +1,24 @@
+function DropDown(el) {
+    this.dd = el;
+    this.initEvents();
+}
+
+DropDown.prototype = {
+    initEvents : function() {
+        var obj = this;
+
+        obj.dd.on('click', function(event){
+            $(this).toggleClass('active');
+            event.stopPropagation();
+        });
+    }
+};
+
 $(function () {
     initializeFirebase();
     sessions();
+
+    var dd = new DropDown( $('.dropdown-wrapper') );
 });
 
 function initializeFirebase() {
@@ -176,21 +194,22 @@ function sessions() {
 
             // Check if there is track in the session (database have sessions without track)
             if (session.track) {
-                divSession.addClass(session.track.toUpperCase());
+                divSession.addClass(formatTrackId(session.track));
                 // Check if there is a color for this track in the database
                 if (tracks[session.track.toUpperCase()]) {
                     divSession.css("background-color", tracks[session.track.toUpperCase()].color);
                 }
 
                 // Add this track to the filter list if this is not there yet
-                var trackId = session.track.toUpperCase().replace(/\s+/g, '-').replace(/\./g, '');
+                var trackId = formatTrackId(session.track);
                 var trackList = $("#day" + session.day + "-track-filter ul");
                 if (!(trackList.find("li." + trackId).length)) {
                     html = "<li class='day" + session.day + " " + trackId + "'>" +
+                        "<a href='#' style='border-left-color: " + tracks[session.track.toUpperCase()].color + "'>" +
                         "<input type='checkbox' id='day" + session.day + "-" + trackId + "' name='" + trackId + "' " +
                         "class='track-filter' value='" + session.track + "'>" +
                         "<label for='day" + session.day + "-" + trackId + "'>" + session.track + "</label>" +
-                        "</li>";
+                        "</a></li>";
                     trackList.append(html)
                 }
             }
@@ -232,19 +251,32 @@ function sessions() {
      * @param input Checkbox (track) clicked
      */
     function filterTracks(input) {
-        var filterWrapper = $(input).parent().parent().parent();
-        var allSessions = $(filterWrapper).parent().find("div.session");
-        var checkeds = filterWrapper.find(".track-filter:checkbox:checked");
+        var checkbox = $(input);
+        var dayWrapper = $(input).parent().parent().parent().parent().parent();
+        var allSessions = dayWrapper.find("div.session");
+        var dropdownWrapper = dayWrapper.find(".dropdown-wrapper");
+        var checkeds = dropdownWrapper.find(".track-filter:checkbox:checked");
+        var filterWrapper = dayWrapper.find(".filter-wrapper");
+        var filters = dayWrapper.find(".filters");
 
         // Hide all to display only filtered
         allSessions.addClass("hide");
 
+        filterWrapper.removeClass("hide");
+
+        var filtersText = "";
         for (i = 0; i < checkeds.length; i++) {
-            $(filterWrapper).parent().find("div.session." + $(checkeds[i]).val().toUpperCase()).removeClass("hide");
+            if(i > 0){
+                filtersText += ", "
+            }
+            filtersText += $(checkeds[i]).val();
+            dayWrapper.find("div.session." + formatTrackId($(checkeds[i]).val())).removeClass("hide");
         }
+        filters.text(filtersText);
 
         // if there is no track checked, display all again
         if (checkeds.length == 0) {
+            filterWrapper.addClass("hide");
             allSessions.removeClass("hide");
         }
     }
@@ -269,6 +301,10 @@ function sessions() {
         }
 
         return s;
+    }
+
+    function formatTrackId(trackName) {
+        return trackName.toUpperCase().replace(/\s+/g, '-').replace(/\./g, '');
     }
 
 }
