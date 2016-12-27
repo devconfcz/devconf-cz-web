@@ -38,8 +38,12 @@ function sessions() {
             event.stopImmediatePropagation();
             var sessionId = $(this).attr("id");
             if (sessionId) {
-                showSessionModal(sessions[sessionId]);
+                openSessionModal(sessions[sessionId]);
             }
+        })
+        .on("change", ".track-filter", function (event) {
+            event.stopImmediatePropagation();
+            filterTracks($(this));
         });
 
     // -- Helper methods ----------------------------------------------------------------------------------------------
@@ -75,7 +79,6 @@ function sessions() {
                 var track = childSnapshot.val();
                 tracks[track.name.toUpperCase()] = track;
             });
-            createTrackFilter();
         });
     }
 
@@ -93,6 +96,9 @@ function sessions() {
         });
     }
 
+    /**
+     * Retrieve all sesions from database
+     */
     function retrieveSessions() {
         var sessionsRef = firebase.database().ref().child("sessions").orderByChild("start");
 
@@ -119,88 +125,149 @@ function sessions() {
         $("table.day3 > thead").append(html);
     }
 
-    function createTrackFilter() {
-    }
-
     /**
-     * Add the session in the table cell
+     * Adds a session in the corresponding cell
      *
      * @param session Session
      */
     function addSessionInTable(session) {
 
         var html;
+        var sessionType = session.type.toLowerCase();
 
-        if (session.type.toLowerCase() == "talk") {
+        if (sessionType == "talk" || sessionType == "keynote") {
 
-            var timeslot = session.start.replace(/\s+/g, '-').replace(/:/g, '-');
-            var hour = timeslot.split("-")[0];
-            var minute = timeslot.split("-")[1];
+            var timeslot = session.start.replace(/:/g, '_');
+            var hour = timeslot.split("_")[0];
+            var minute = timeslot.split("_")[1];
 
-            if (!$("tr." + timeslot).length) {
-                html = "<tr class='" + timeslot + "'>" +
+            // If there is not timeslot for this time yet, create one
+            if (!($("table.day" + session.day + " tr." + timeslot).length)) {
+                html = "<tr class='timeslot " + timeslot + "'>" +
                     "<td class='session-time'>" +
                     "<span class='session-hour'>" + hour + "</span>" +
                     "<span class='session-minute'>" + minute + "</span>" +
                     "</td>";
 
+                // Create a TD per room
                 for (key in rooms) {
-                    html += "<td class='session hoverable " + rooms[key].name.toUpperCase() + "'></td>"
+                    html += "<td class='" + rooms[key].name.toUpperCase() + "'></td>"
                 }
                 html += "</tr>";
+
                 $("table.day" + session.day + " > tbody:last-child").append(html);
             }
 
-            html = "<div class='session-title'>" + session.title + "</div>" +
-                "<div class='hide-on-med-and-down session-track'><i class='tiny material-icons'>local_offer</i>" + session.track + "</div>";
-            var td = $("table.day" + session.day + " tr." + timeslot).find("td." + session.room.toUpperCase());
-            td.attr("id", session.id);
+            // New td content
+            html = "<div id='" + session.id + "' class='session hoverable'>" +
+                "<div class='session-title'>" + session.title + "</div>" +
+                "<div class='hide-on-med-and-down session-track'>" +
+                "<i class='tiny material-icons'>local_offer</i>" + session.track +
+                "</div>" +
+                "</div>";
+
+            var td = $("table.day" + session.day + " tr." + timeslot + " td." + session.room.toUpperCase());
+            if (!td.length) {
+                console.log("Day: " + session.day + " & Start: " + session.start + " & Room: " + session.room + " & Track: " + session.track + " & Title: " + session.title);
+            }
+            td.html(html);
+
+            var divSession = td.find("div.session");
 
             // Check if there is track in the session (database have sessions without track)
             if (session.track) {
-                td.addClass(session.track.toUpperCase());
+                divSession.addClass(session.track.toUpperCase());
                 // Check if there is a color for this track in the database
-                if(tracks[session.track.toUpperCase()]) {
-                    td.css("background-color", tracks[session.track.toUpperCase()].color);
+                if (tracks[session.track.toUpperCase()]) {
+                    divSession.css("background-color", tracks[session.track.toUpperCase()].color);
+                }
+
+                // Add this track to the filter list if this is not there yet
+                var trackId = session.track.toUpperCase().replace(/\s+/g, '-').replace(/\./g, '');
+                var trackList = $("#day" + session.day + "-track-filter ul");
+                if (!(trackList.find("li." + trackId).length)) {
+                    html = "<li class='day" + session.day + " " + trackId + "'>" +
+                        "<input type='checkbox' id='day" + session.day + "-" + trackId + "' name='" + trackId + "' " +
+                        "class='track-filter' value='" + session.track + "'>" +
+                        "<label for='day" + session.day + "-" + trackId + "'>" + session.track + "</label>" +
+                        "</li>";
+                    trackList.append(html)
                 }
             }
-            td.html(html);
 
         }
 
     }
 
     /**
-     * Show the session detail
+     * Show session details
      *
      * @param session Session
      */
-    function showSessionModal(session) {
+    function openSessionModal(session) {
 
         var modal = $("#session-detail");
         var content = modal.find(".modal-content");
         var footer = modal.find(".modal-footer");
 
+        modal.css("background-color", tracks[session.track.toUpperCase()].color);
+
+        var description = (session.description) ? session.description : "";
+
         content.find("h5").text(session.title);
-        content.find(".session-description").html(session.description);
-        content.find(".session-speakers").empty();
-        content.find(".session-speakers").append(getSpeakers(session.speakers));
+        content.find(".session-description").html(description);
+        content.find(".session-speakers").text(getSpeakers(session.speakers));
         content.find(".session-info .session-track").text(session.track);
         content.find(".session-info .session-room").text(session.room);
+
+        (session.speakers) ? $(".session-speakers-icon").removeClass("hide") : $(".session-speakers-icon").addClass("hide");
 
         modal.modal('open');
 
     }
 
+    /**
+     * Filter session by track
+     *
+     * @param input Checkbox (track) clicked
+     */
+    function filterTracks(input) {
+        var filterWrapper = $(input).parent().parent().parent();
+        var allSessions = $(filterWrapper).parent().find("div.session");
+        var checkeds = filterWrapper.find(".track-filter:checkbox:checked");
+
+        // Hide all to display only filtered
+        allSessions.addClass("hide");
+
+        for (i = 0; i < checkeds.length; i++) {
+            $(filterWrapper).parent().find("div.session." + $(checkeds[i]).val().toUpperCase()).removeClass("hide");
+        }
+
+        // if there is no track checked, display all again
+        if (checkeds.length == 0) {
+            allSessions.removeClass("hide");
+        }
+    }
+
+    /**
+     * Speaker formatter
+     *
+     * @param speakersId Speakers id
+     * @returns {string} Speakers formatted
+     */
     function getSpeakers(speakersId) {
         var s = "";
-        for (i = 0; i < speakersId.length; i++) {
-            var speaker = speakers[speakersId[i]];
-            s += speaker.name;
-            if (speakersId.length - 1 > i) {
-                s += " & ";
+
+        if (speakersId) {
+            for (i = 0; i < speakersId.length; i++) {
+                var speaker = speakers[speakersId[i]];
+                s += speaker.name;
+                if (speakersId.length - 1 > i) {
+                    s += " & ";
+                }
             }
         }
+
         return s;
     }
 

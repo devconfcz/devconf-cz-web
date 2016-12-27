@@ -14,9 +14,29 @@ body, html {
  * SESSIONS
  *********************************************************************************************************************/
 
+table {
+    table-layout: fixed;
+}
+
 .session {
-    padding: 10px;
-    margin: 2px;
+    padding: 1px 5px 1px 5px;
+    cursor: pointer;
+}
+
+@media (min-width: 993px) {
+    .session {
+        padding: 10px;
+    }
+}
+
+.session-title,
+.session-description,
+.session-speakers,
+.session-info,
+.session-room,
+.session-track,
+.session-speakers {
+    color: #FFFFFF;
 }
 
 .session-time {
@@ -28,12 +48,8 @@ body, html {
     margin-left: 3px;
 }
 
-.session-title, .session-track {
-    color: #FFFFFF;
-}
-
 @media (min-width: 993px) {
-    .session-title {
+    .session .session-title {
         min-height: 100px;
     }
 
@@ -81,8 +97,5 @@ table.responsive-table td.session-time {
 
 table.responsive-table td {
     font-size: 14px;
-    min-height: 51px;
-    cursor: pointer;
+    height: 51px;
 }
-
-
