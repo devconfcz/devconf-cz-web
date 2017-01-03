@@ -1,24 +1,6 @@
-function DropDown(el) {
-    this.dd = el;
-    this.initEvents();
-}
-
-DropDown.prototype = {
-    initEvents : function() {
-        var obj = this;
-
-        obj.dd.on('click', function(event){
-            $(this).toggleClass('active');
-            event.stopPropagation();
-        });
-    }
-};
-
 $(function () {
     initializeFirebase();
     sessions();
-
-    var dd = new DropDown( $('.dropdown-wrapper') );
 });
 
 function initializeFirebase() {
@@ -52,6 +34,7 @@ function sessions() {
     // -- HTML Triggers -----------------------------------------------------------------------------------------------
 
     $("body")
+    // When click in a session show your details in a modal
         .on("click", ".session", function (event) {
             event.stopImmediatePropagation();
             var sessionId = $(this).attr("id");
@@ -59,6 +42,12 @@ function sessions() {
                 openSessionModal(sessions[sessionId]);
             }
         })
+        // When click on filter dropdown, open/close it
+        .on('click', ".dropdown-wrapper", function (event) {
+            event.stopPropagation();
+            $(this).toggleClass('active');
+        })
+        // When click in track on filter, add it to the filter
         .on("change", ".track-filter", function (event) {
             event.stopImmediatePropagation();
             filterTracks($(this));
@@ -75,7 +64,7 @@ function sessions() {
         roomsRef.once('value', function (snapshot) {
             snapshot.forEach(function (childSnapshot) {
                 var room = childSnapshot.val();
-                rooms[room.name.toUpperCase()] = room;
+                rooms[formatRoom(room.name)] = room;
             });
 
             createTableHeader();
@@ -95,7 +84,7 @@ function sessions() {
         tracksRef.once('value', function (snapshot) {
             snapshot.forEach(function (childSnapshot) {
                 var track = childSnapshot.val();
-                tracks[track.name.toUpperCase()] = track;
+                tracks[formatTrack(track.name)] = track;
             });
         });
     }
@@ -130,6 +119,39 @@ function sessions() {
     }
 
     /**
+     * Room name formatter
+     *
+     * @param roomName
+     * @returns {string}
+     */
+    function formatRoom(roomName) {
+        return roomName.toUpperCase();
+    }
+
+    /**
+     * Track name formatter
+     *
+     * @param trackName
+     * @returns {string}
+     */
+    function formatTrack(trackName) {
+        return trackName.toUpperCase().replace(/\s+/g, '-').replace(/\./g, '');
+    }
+
+    /**
+     *
+     * Formatter a timeslot replacing ":" by "_"
+     *
+     * Example: 10:00 will be change to 10_00
+     *
+     * @param session
+     * @returns {string|XML|void}
+     */
+    function formatTimeSlot(session) {
+        return session.start.replace(/:/g, '_');
+    }
+
+    /**
      * Create table header based in available rooms
      */
     function createTableHeader() {
@@ -150,73 +172,122 @@ function sessions() {
      */
     function addSessionInTable(session) {
 
-        var html;
         var sessionType = session.type.toLowerCase();
 
         if (sessionType == "talk" || sessionType == "keynote") {
 
-            var timeslot = session.start.replace(/:/g, '_');
-            var hour = timeslot.split("_")[0];
-            var minute = timeslot.split("_")[1];
-
-            // If there is not timeslot for this time yet, create one
-            if (!($("table.day" + session.day + " tr." + timeslot).length)) {
-                html = "<tr class='timeslot " + timeslot + "'>" +
-                    "<td class='session-time'>" +
-                    "<span class='session-hour'>" + hour + "</span>" +
-                    "<span class='session-minute'>" + minute + "</span>" +
-                    "</td>";
-
-                // Create a TD per room
-                for (key in rooms) {
-                    html += "<td class='" + rooms[key].name.toUpperCase() + "'></td>"
-                }
-                html += "</tr>";
-
-                $("table.day" + session.day + " > tbody:last-child").append(html);
+            if (!existsTimeSlot(session)) {
+                createTR(session);
             }
 
             // New td content
-            html = "<div id='" + session.id + "' class='session hoverable'>" +
+            var html = "<div id='" + session.id + "' class='session hoverable'>" +
                 "<div class='session-title'>" + session.title + "</div>" +
                 "<div class='hide-on-med-and-down session-track'>" +
                 "<i class='tiny material-icons'>local_offer</i>" + session.track +
                 "</div>" +
                 "</div>";
 
-            var td = $("table.day" + session.day + " tr." + timeslot + " td." + session.room.toUpperCase());
+            var td = findTd(session);
+            // If for some reason this TD (room) does not exists for this day/hour
             if (!td.length) {
-                console.log("Day: " + session.day + " & Start: " + session.start + " & Room: " + session.room + " & Track: " + session.track + " & Title: " + session.title);
-            }
-            td.html(html);
+                log(session);
+            } else {
+                td.html(html);
 
-            var divSession = td.find("div.session");
+                if (session.track) {
 
-            // Check if there is track in the session (database have sessions without track)
-            if (session.track) {
-                divSession.addClass(formatTrackId(session.track));
-                // Check if there is a color for this track in the database
-                if (tracks[session.track.toUpperCase()]) {
-                    divSession.css("background-color", tracks[session.track.toUpperCase()].color);
+                    var divSession = td.find("div.session");
+                    // Add the track has a class in the session to be filtered
+                    divSession.addClass(formatTrack(session.track));
+                    // Check if there is a color for this track in the database
+                    if (tracks[formatTrack(session.track)]) {
+                        divSession.css("background-color", tracks[formatTrack(session.track)].color);
+                    }
+
+                    addTrackToFilterList(session);
                 }
 
-                // Add this track to the filter list if this is not there yet
-                var trackId = formatTrackId(session.track);
-                var trackList = $("#day" + session.day + "-track-filter ul");
-                if (!(trackList.find("li." + trackId).length)) {
-                    html = "<li class='day" + session.day + " " + trackId + "'>" +
-                        "<a href='#' style='border-left-color: " + tracks[session.track.toUpperCase()].color + "'>" +
-                        "<input type='checkbox' id='day" + session.day + "-" + trackId + "' name='" + trackId + "' " +
-                        "class='track-filter' value='" + session.track + "'>" +
-                        "<label for='day" + session.day + "-" + trackId + "'>" + session.track + "</label>" +
-                        "</a></li>";
-                    trackList.append(html)
-                }
             }
 
         }
 
     }
+
+    /**
+     *
+     * Check if already have a tr to the corresponding day/hour
+     *
+     * @param session
+     * @returns {jQuery}
+     */
+    function existsTimeSlot(session) {
+        return $("table.day" + session.day + " tr." + formatTimeSlot(session)).length;
+    }
+
+    /**
+     * Create a TR in the table for the day/hour, add the time for this line and pre create the td for the rooms
+     *
+     * @param session
+     */
+    function createTR(session) {
+        var html = "<tr class='timeslot " + formatTimeSlot(session) + "'>" +
+            "<td class='session-time'>" +
+            "<span class='session-hour'>" + session.start.split(":")[0] + "</span>" +
+            "<span class='session-minute'>" + session.start.split(":")[1] + "</span>" +
+            "</td>";
+
+        // Create a TD per room
+        for (key in rooms) {
+            html += "<td class='" + formatRoom(rooms[key].name) + "'></td>"
+        }
+        html += "</tr>";
+
+        $("table.day" + session.day + " > tbody:last-child").append(html);
+    }
+
+    function findTd(session) {
+        return $("table.day" + session.day + " tr." + formatTimeSlot(session) + " td." + formatRoom(session.room));
+    }
+
+    /**
+     * Add the session tracker to a tracker filter list if this is not there yet
+     *
+     * @param session
+     */
+    function addTrackToFilterList(session) {
+        var trackId = formatTrack(session.track);
+        var trackList = $("#day" + session.day + "-track-filter ul");
+        if (!(trackList.find("li." + trackId).length)) {
+            var html = "<li class='day" + session.day + " " + trackId + "'>" +
+                "<a href='#' style='border-left-color: " + tracks[formatTrack(session.track)].color + "'>" +
+                "<input type='checkbox' id='day" + session.day + "-" + trackId + "' name='" + trackId + "' " +
+                "class='track-filter' value='" + session.track + "'>" +
+                "<label for='day" + session.day + "-" + trackId + "'>" + session.track + "</label>" +
+                "</a></li>";
+            trackList.append(html)
+        }
+
+        sortUnorderedList(trackList);
+    }
+
+    /**
+     * Sort the <ul> list
+     *
+     * @param theList
+     */
+    function sortUnorderedList(theList) {
+        var listitems = theList.children('li').get();
+
+        listitems.sort(function (a, b) {
+            return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
+        });
+
+        $.each(listitems, function (idx, itm) {
+            theList.append(itm);
+        });
+    }
+
 
     /**
      * Show session details
@@ -266,11 +337,11 @@ function sessions() {
 
         var filtersText = "";
         for (i = 0; i < checkeds.length; i++) {
-            if(i > 0){
+            if (i > 0) {
                 filtersText += ", "
             }
             filtersText += $(checkeds[i]).val();
-            dayWrapper.find("div.session." + formatTrackId($(checkeds[i]).val())).removeClass("hide");
+            dayWrapper.find("div.session." + formatTrack($(checkeds[i]).val())).removeClass("hide");
         }
         filters.text(filtersText);
 
@@ -303,8 +374,20 @@ function sessions() {
         return s;
     }
 
-    function formatTrackId(trackName) {
-        return trackName.toUpperCase().replace(/\s+/g, '-').replace(/\./g, '');
+    /**
+     * Log session on console
+     *
+     * @param session
+     */
+    function log(session) {
+        console.log(
+            "Day: " + session.day + " & " +
+            "Start: " + session.start + " & " +
+            "Room: " + session.room + " & " +
+            "Track: " + session.track + " & " +
+            "Title: " + session.title
+        );
     }
+
 
 }
