@@ -133,7 +133,7 @@ function login() {
     var uiConfig = {
         "signInSuccessUrl": "admin.html",
         "signInOptions": [
-            firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+            firebase.auth.GoogleAuthProvider.PROVIDER_ID
         ]
     };
 
@@ -326,7 +326,14 @@ function configure(config) {
                         "</td>";
                     break;
                 default:
-                    var value = (field.options && field.options.truncate && data[field.name].length > field.options.truncate) ? data[field.name].substring(0, field.options.truncate) + "..." : data[field.name];
+                    var value = "";
+                    if (data[field.name]) {
+                        if (field.options && field.options.truncate && data[field.name].length > field.options.truncate) {
+                            value = data[field.name].substring(0, field.options.truncate) + "...";
+                        } else {
+                            value = data[field.name];
+                        }
+                    }
                     html += "<td class='" + field.name + " mdl-data-table__cell--non-numeric'>" + value + "</td>";
                     break;
             }
