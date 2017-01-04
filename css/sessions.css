@@ -27,7 +27,8 @@ table {
 .session-info,
 .session-room,
 .session-track,
-.session-speakers {
+.session-speakers,
+.session-speakers a {
     color: #FFFFFF;
 }
 

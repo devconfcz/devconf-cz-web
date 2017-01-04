@@ -307,7 +307,7 @@ function sessions() {
 
         content.find("h5").text(session.title);
         content.find(".session-description").html(description);
-        content.find(".session-speakers").text(getSpeakers(session.speakers));
+        content.find(".session-speakers").html(getSpeakers(session.speakers));
         content.find(".session-info .session-track").text(session.track);
         content.find(".session-info .session-room").text(session.room);
 
@@ -365,7 +365,7 @@ function sessions() {
         if (speakersId) {
             for (i = 0; i < speakersId.length; i++) {
                 var speaker = speakers[speakersId[i]];
-                s += speaker.name;
+                s += "<a href='/speakers#" + speakers[speakersId[i]].id + "'>" + speaker.name + "</a>";
                 if (speakersId.length - 1 > i) {
                     s += " & ";
                 }
