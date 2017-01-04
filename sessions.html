@@ -12,12 +12,14 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script type="text/javascript"
             src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+    <script type="text/javascript" src="js/global.js"></script>
     <script type="text/javascript" src="js/sessions.js"></script>
 
     <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
     <link type="text/css" rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+    <link type="text/css" rel="stylesheet" href="css/global.css">
     <link type="text/css" rel="stylesheet" href="css/sessions.css">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -28,7 +30,21 @@
 <body>
 <div class="container">
 
-    <div class="row">
+    <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+                <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sessions" class="row hide">
         <div class="col s12">
             <ul class="tabs">
                 <li class="tab"><a href="#day1">Day 1</a></li>

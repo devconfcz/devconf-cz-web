@@ -1,19 +1,6 @@
 $(function () {
-    initializeFirebase();
     sessions();
 });
-
-function initializeFirebase() {
-    var config = {
-        apiKey: "AIzaSyBw1XF-Jbkz3DV8mANU_SQgYYq-wErVZfQ",
-        authDomain: "devconf-cz-2017.firebaseapp.com",
-        databaseURL: "https://devconf-cz-2017.firebaseio.com",
-        storageBucket: "devconf-cz-2017.appspot.com",
-        messagingSenderId: "88312300184"
-    };
-
-    firebase.initializeApp(config);
-}
 
 function sessions() {
 
@@ -113,9 +100,23 @@ function sessions() {
             snapshot.forEach(function (childSnapshot) {
                 var session = childSnapshot.val();
                 sessions[session.id] = session;
+
                 addSessionInTable(session);
             });
+
+            displaySessions();
         });
+
+    }
+
+    function displaySessions() {
+        $("#sessions").removeClass("hide");
+
+        // Force select the first tab
+        var firstTabName = $("ul.tabs li.tab:first a").attr('href').substring(1);
+        $('ul.tabs').tabs('select_tab', firstTabName);
+
+        $(".preloader-wrapper").addClass("hide");
     }
 
     /**
