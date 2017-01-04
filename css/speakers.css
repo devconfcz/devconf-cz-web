@@ -1,16 +1,4 @@
 /**********************************************************************************************************************
- * GLOBAL
- *********************************************************************************************************************/
-
-body, html {
-    background: #EEE;
-}
-
-.container {
-    width: 90%;
-}
-
-/**********************************************************************************************************************
  * SPEAKERS
  *********************************************************************************************************************/
 
@@ -27,14 +15,14 @@ body, html {
     cursor: pointer;
 }
 
-@media (min-width: 703px) {
+@media (min-width: 718px) {
     .card.speaker {
         margin: 8px;
         width: calc(100% / 2 - 2 * 8px);
     }
 }
 
-@media (min-width: 1054px) {
+@media (min-width: 1069px) {
     .card.speaker {
         width: calc(100% / 3 - 2 * 8px);
     }
@@ -58,10 +46,18 @@ body, html {
     line-height: 1.2;
 }
 
-.card-content.speaker-bio {
+.speaker-country, .speaker-organization, .speaker-bio {
     color: #212121;
-    font-weight: 400;
-    text-align: justify;
     font-size: 12px;
-    display: none;
+    font-weight: 400;
+}
+
+.speaker-bio {
+    padding-top: 10px;
+    text-align: justify;
+}
+
+.card .card-action a:not(.btn):not(.btn-large):not(.btn-floating) {
+    color: #039be5;
+    text-transform: none;
 }

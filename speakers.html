@@ -3,11 +3,16 @@
 <head>
     <script type="text/javascript" src="https://www.gstatic.com/firebasejs/3.6.0/firebase.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+    <script type="text/javascript" src="js/global.js"></script>
     <script type="text/javascript" src="js/speakers.js"></script>
 
-    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
-    <link type="text/css" rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+    <link type="text/css" rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+    <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+    <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link type="text/css" rel="stylesheet" href="css/global.css">
     <link type="text/css" rel="stylesheet" href="css/speakers.css">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -17,7 +22,40 @@
 
 <body>
 <div class="container">
+    <div class="preloader-wrapper big active">
+        <div class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+                <div class="circle"></div>
+            </div>
+            <div class="gap-patch">
+                <div class="circle"></div>
+            </div>
+            <div class="circle-clipper right">
+                <div class="circle"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="speakers-container">
+    </div>
+
+    <div id="speaker-detail" class="modal">
+        <div class="modal-content">
+            <div class="card">
+                <div class="card-image">
+                    <img class="speaker-image" src="">
+                    <span class="card-title speaker-name"></span>
+                </div>
+                <div class="card-content">
+                    <p><i class="material-icons tiny">place</i> <span class="speaker-country"></span></p>
+                    <p><i class="material-icons tiny">business</i> <span class="speaker-organization"></span></p>
+                    <p class="speaker-bio"></p>
+                </div>
+                <div class="card-action">
+                    <span class="speaker-twitter"></span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </body>
