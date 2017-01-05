@@ -301,7 +301,7 @@ function sessions() {
         var content = modal.find(".modal-content");
         var footer = modal.find(".modal-footer");
 
-        modal.css("background-color", tracks[session.track.toUpperCase()].color);
+        modal.css("background-color", tracks[formatTrack(session.track)].color);
 
         var description = (session.description) ? session.description : "";
 
