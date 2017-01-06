@@ -23,7 +23,7 @@ function sessions() {
     $("body")
     // When click in a session show your details in a modal
         .on("click", ".session", function (event) {
-            event.stopImmediatePropagation();
+            event.preventDefault();
             var sessionId = $(this).attr("id");
             if (sessionId) {
                 openSessionModal(sessions[sessionId]);
@@ -31,13 +31,24 @@ function sessions() {
         })
         // When click on filter dropdown, open/close it
         .on('click', ".dropdown-wrapper", function (event) {
-            event.stopPropagation();
+            event.stopImmediatePropagation();
             $(this).toggleClass('active');
         })
         // When click in track on filter, add it to the filter
         .on("change", ".track-filter", function (event) {
             event.stopImmediatePropagation();
             filterTracks($(this));
+        })
+        // When click speaker name on session details, open a modal with speaker details
+        .on("click", ".speaker-link", function (event) {
+            event.preventDefault();
+            var speakerId = $(this).attr("href").split("#")[1];
+            showSpeakerDetails(speakerId);
+        })
+        // When click speaker name on session details, open a modal with speaker details
+        .on("click", ".back", function (event) {
+            event.preventDefault();
+            $('#speaker-detail').modal('close');
         });
 
     // -- Helper methods ----------------------------------------------------------------------------------------------
@@ -368,7 +379,7 @@ function sessions() {
         if (speakersId) {
             for (i = 0; i < speakersId.length; i++) {
                 var speaker = speakers[speakersId[i]];
-                s += "<a href='/speakers#" + speakers[speakersId[i]].id + "'>" + speaker.name + "</a>";
+                s += "<a href='/speakers#" + speakers[speakersId[i]].id + "' class='speaker-link'>" + speaker.name + "</a>";
                 if (speakersId.length - 1 > i) {
                     s += " & ";
                 }
@@ -376,6 +387,28 @@ function sessions() {
         }
 
         return s;
+    }
+
+    function showSpeakerDetails(speakerId) {
+        var speaker = speakers[speakerId];
+        var modal = $('#speaker-detail');
+
+        modal.find(".speaker-image").attr("src", speaker.avatar);
+        modal.find(".speaker-name").text(speaker.name);
+        modal.find(".speaker-country").text(speaker.country);
+        modal.find(".speaker-organization").text(speaker.organization);
+        modal.find(".speaker-bio").text(speaker.bio);
+
+        var twitterHTML = "";
+        if (speaker.twitter) {
+            twitterHTML = "<a href='http://twitter.com/" + speaker.twitter + "' target='_blank' class='twitter'>" +
+                "@" + speaker.twitter + "" +
+                "</a>";
+
+        }
+        modal.find(".speaker-twitter").html(twitterHTML);
+
+        modal.modal('open');
     }
 
     /**

@@ -80,6 +80,17 @@ table {
     line-height: normal;
 }
 
+.back {
+    margin-top: 20px;
+    margin-left: 20px;
+}
+
+.close {
+
+}
+
+cursor: pointer;
+
 th {
     text-align: center;
 }
