@@ -310,6 +310,9 @@ function sessions() {
         content.find(".session-speakers").html(getSpeakers(session.speakers));
         content.find(".session-info .session-track").text(session.track);
         content.find(".session-info .session-room").text(session.room);
+        content.find(".session-info .session-duration").text(session.duration);
+        content.find(".session-info .session-start").text("Day " + session.day + " at " + session.start);
+
 
         (session.speakers) ? $(".session-speakers-icon").removeClass("hide") : $(".session-speakers-icon").addClass("hide");
 

@@ -72,7 +72,7 @@ table {
     margin-right: 2px;
 }
 
-.session-track, .session-room, .session-difficulty, .session-speakers {
+.session-speakers, .session-track, .session-room, .session-start, .session-duration {
     margin-bottom: 5px;
     margin-right: 3px;
     font-size: 12px;
