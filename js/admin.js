@@ -32,6 +32,7 @@ $(function () {
             new FieldOption(FieldType.TEXT, "name"),
             new FieldOption(FieldType.TEXT, "email"),
             new FieldOption(FieldType.TEXT, "country"),
+            new FieldOption(FieldType.TEXT, "organization"),
             new FieldOption(FieldType.TEXT, "twitter"),
             new FieldOption(FieldType.TEXTAREA, "bio", {cols: 10, truncate: 70})
         ],
