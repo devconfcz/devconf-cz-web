@@ -180,7 +180,7 @@ function sessions() {
         var workshops = "<tr><th></th>";
 
         for (var key in rooms) {
-            if(roomType(rooms[key]) == "workshops") {
+            if (roomType(rooms[key]) == "workshops") {
                 workshops += "<th>" + rooms[key].name + "</th>";
             } else {
                 talks += "<th>" + rooms[key].name + "</th>";
@@ -264,7 +264,7 @@ function sessions() {
 
         // Create a TD per room
         for (key in rooms) {
-            if(roomType(rooms[key]) == sessionType(session)) {
+            if (roomType(rooms[key]) == sessionType(session)) {
                 html += "<td class='" + formatRoom(rooms[key].name) + "'></td>"
             }
         }
@@ -279,7 +279,9 @@ function sessions() {
      * @returns {string} The type of the session "workshops" or "talks"
      */
     function roomType(room) {
-        return (room.type.toLowerCase() == "keynote" || room.type.toLowerCase() == "talk")
+        return (room.type.toLowerCase() == "keynote"
+        || room.type.toLowerCase() == "talk"
+        || room.type.toLowerCase() == "meetup")
             ? "talks" : "workshops";
     }
 
@@ -291,7 +293,10 @@ function sessions() {
      * @returns {string} The type of the session "workshops" or "talks"
      */
     function sessionType(session) {
-        return (session.type.toLowerCase() == "keynote" || session.type.toLowerCase() == "talk")
+        return (session.type.toLowerCase() == "keynote"
+            || session.type.toLowerCase() == "talk"
+            || session.type.toLowerCase() == "meetup"
+        )
             ? "talks" : "workshops";
     }
 
@@ -465,7 +470,7 @@ function sessions() {
             "Day: " + session.day + " & " +
             "Start: " + session.start + " & " +
             "Room: " + session.room + " & " +
-            "Type: " + session.type+ " & " +
+            "Type: " + session.type + " & " +
             "Track: " + session.track + " & " +
             "Title: " + session.title
         );
