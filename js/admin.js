@@ -17,7 +17,8 @@ $(function () {
         model: "room",
         fieldId: "key",
         fields: [
-            new FieldOption(FieldType.TEXT, "name")
+            new FieldOption(FieldType.TEXT, "name"),
+            new FieldOption(FieldType.TEXT, "type")
         ],
         data: {},
         databaseRef: firebase.database().ref().child("rooms"),
