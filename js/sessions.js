@@ -124,8 +124,17 @@ function sessions() {
         $("#sessions").removeClass("hide");
 
         // Force select the first tab
-        var firstTabName = $("ul.tabs li.tab:first a").attr('href').substring(1);
-        $('ul.tabs').tabs('select_tab', firstTabName);
+        var sessionsTabs = $("#sessions").find("ul.tabs.tabs-fixed-width");
+        var talks = sessionsTabs.find("li.tab:first a").attr('href').substring(1);
+        sessionsTabs.tabs('select_tab', talks);
+
+        var talksTabs = $("#talks").find("ul.tabs");
+        var day1Talks = talksTabs.find("li.tab:first a").attr('href').substring(1);
+        talksTabs.tabs('select_tab', day1Talks);
+
+        // var workshopsTabs = $("#workshops").find("ul.tabs");
+        // var day1Workshops = workshopsTabs.find("li.tab:first a").attr('href').substring(1);
+        // workshopsTabs.tabs('select_tab', day1Workshops);
 
         $(".preloader-wrapper").addClass("hide");
     }
@@ -147,7 +156,7 @@ function sessions() {
      * @returns {string}
      */
     function formatTrack(trackName) {
-        return trackName.toUpperCase().replace(/\s+/g, '-').replace(/\./g, '');
+        return trackName.toUpperCase().replace(/\s+/g, '-').replace(/,/g, '').replace(/\./g, '');
     }
 
     /**
@@ -167,14 +176,24 @@ function sessions() {
      * Create table header based in available rooms
      */
     function createTableHeader() {
-        var html = "<tr><th></th>";
+        var talks = "<tr><th></th>";
+        var workshops = "<tr><th></th>";
+
         for (var key in rooms) {
-            html += "<th>" + rooms[key].name + "</th>";
+            if(roomType(rooms[key]) == "workshops") {
+                workshops += "<th>" + rooms[key].name + "</th>";
+            } else {
+                talks += "<th>" + rooms[key].name + "</th>";
+            }
         }
 
-        $("table.day1 > thead").append(html);
-        $("table.day2 > thead").append(html);
-        $("table.day3 > thead").append(html);
+        $("#talks").find("table.day1 > thead").append(talks);
+        $("#talks").find("table.day2 > thead").append(talks);
+        $("#talks").find("table.day3 > thead").append(talks);
+
+        $("#workshops").find("table.day1 > thead").append(workshops);
+        $("#workshops").find("table.day2 > thead").append(workshops);
+        $("#workshops").find("table.day3 > thead").append(workshops);
     }
 
     /**
@@ -184,42 +203,36 @@ function sessions() {
      */
     function addSessionInTable(session) {
 
-        var sessionType = session.type.toLowerCase();
+        if (!existsTimeSlot(session)) {
+            createTR(session);
+        }
 
-        if (sessionType == "talk" || sessionType == "keynote") {
+        // New td content
+        var html = "<div id='" + session.id + "' class='session hoverable'>" +
+            "<div class='session-title'>" + session.title + "</div>" +
+            "<div class='hide-on-med-and-down session-track'>" +
+            "<i class='tiny material-icons'>local_offer</i>" + session.track +
+            "</div>" +
+            "</div>";
 
-            if (!existsTimeSlot(session)) {
-                createTR(session);
-            }
+        var td = findTd(session);
+        // If for some reason this TD (room) does not exists for this day/hour
+        if (!td.length) {
+            log(session);
+        } else {
+            td.html(html);
 
-            // New td content
-            var html = "<div id='" + session.id + "' class='session hoverable'>" +
-                "<div class='session-title'>" + session.title + "</div>" +
-                "<div class='hide-on-med-and-down session-track'>" +
-                "<i class='tiny material-icons'>local_offer</i>" + session.track +
-                "</div>" +
-                "</div>";
+            if (session.track) {
 
-            var td = findTd(session);
-            // If for some reason this TD (room) does not exists for this day/hour
-            if (!td.length) {
-                log(session);
-            } else {
-                td.html(html);
-
-                if (session.track) {
-
-                    var divSession = td.find("div.session");
-                    // Add the track has a class in the session to be filtered
-                    divSession.addClass(formatTrack(session.track));
-                    // Check if there is a color for this track in the database
-                    if (tracks[formatTrack(session.track)]) {
-                        divSession.css("background-color", tracks[formatTrack(session.track)].color);
-                    }
-
-                    addTrackToFilterList(session);
+                var divSession = td.find("div.session");
+                // Add the track has a class in the session to be filtered
+                divSession.addClass(formatTrack(session.track));
+                // Check if there is a color for this track in the database
+                if (tracks[formatTrack(session.track)]) {
+                    divSession.css("background-color", tracks[formatTrack(session.track)].color);
                 }
 
+                addTrackToFilterList(session);
             }
 
         }
@@ -234,7 +247,7 @@ function sessions() {
      * @returns {jQuery}
      */
     function existsTimeSlot(session) {
-        return $("table.day" + session.day + " tr." + formatTimeSlot(session)).length;
+        return $("#" + sessionType(session)).find("table.day" + session.day + " tr." + formatTimeSlot(session)).length;
     }
 
     /**
@@ -251,15 +264,45 @@ function sessions() {
 
         // Create a TD per room
         for (key in rooms) {
-            html += "<td class='" + formatRoom(rooms[key].name) + "'></td>"
+            if(roomType(rooms[key]) == sessionType(session)) {
+                html += "<td class='" + formatRoom(rooms[key].name) + "'></td>"
+            }
         }
         html += "</tr>";
+        $("#" + sessionType(session)).find("table.day" + session.day + " > tbody:last-child").append(html);
+    }
 
-        $("table.day" + session.day + " > tbody:last-child").append(html);
+    /**
+     * Check if this is a workshop or talk session
+     *
+     * @param room The room
+     * @returns {string} The type of the session "workshops" or "talks"
+     */
+    function roomType(room) {
+        return (room.type.toLowerCase() == "keynote" || room.type.toLowerCase() == "talk")
+            ? "talks" : "workshops";
+    }
+
+
+    /**
+     * Check if this is a workshop or talk session
+     *
+     * @param session The session
+     * @returns {string} The type of the session "workshops" or "talks"
+     */
+    function sessionType(session) {
+        return (session.type.toLowerCase() == "keynote" || session.type.toLowerCase() == "talk")
+            ? "talks" : "workshops";
     }
 
     function findTd(session) {
-        return $("table.day" + session.day + " tr." + formatTimeSlot(session) + " td." + formatRoom(session.room));
+        var type = sessionType(session);
+        return $("#" + type)
+            .find(
+                "table.day" + session.day +
+                " tr." + formatTimeSlot(session) +
+                " td." + formatRoom(session.room)
+            );
     }
 
     /**
@@ -268,8 +311,9 @@ function sessions() {
      * @param session
      */
     function addTrackToFilterList(session) {
+        var type = sessionType(session);
+        var trackList = $("#" + type).find(".day" + session.day + "-track-filter ul");
         var trackId = formatTrack(session.track);
-        var trackList = $("#day" + session.day + "-track-filter ul");
         if (!(trackList.find("li." + trackId).length)) {
             var html = "<li class='day" + session.day + " " + trackId + "'>" +
                 "<a href='#' style='border-left-color: " + tracks[formatTrack(session.track)].color + "'>" +
@@ -421,6 +465,7 @@ function sessions() {
             "Day: " + session.day + " & " +
             "Start: " + session.start + " & " +
             "Room: " + session.room + " & " +
+            "Type: " + session.type+ " & " +
             "Track: " + session.track + " & " +
             "Title: " + session.title
         );

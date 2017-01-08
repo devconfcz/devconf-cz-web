@@ -46,50 +46,114 @@
 
     <div id="sessions" class="row hide">
         <div class="col s12">
-            <ul class="tabs">
-                <li class="tab"><a href="#day1">Day 1</a></li>
-                <li class="tab"><a href="#day2">Day 2</a></li>
-                <li class="tab"><a href="#day3">Day 3</a></li>
+            <ul class="tabs tabs-fixed-width">
+                <li class="tab"><a href="#talks" class="active">Talks</a></li>
+                <li class="tab"><a href="#workshops">Workshops</a></li>
             </ul>
         </div>
-        <div id="day1" class="col s12">
-            <div class="filter-wrapper left hide hide-on-med-and-down">Filtered by: <span class="filters"></span></div>
-            <div id="day1-track-filter" class="dropdown-wrapper hide-on-med-and-down right">Filter
-                <ul class="dropdown">
+        <div id="talks" class="col s12">
+            <div class="col s12">
+                <ul class="tabs">
+                    <li class="tab"><a href="#day1-talks" class="active">Day 1</a></li>
+                    <li class="tab"><a href="#day2-talks">Day 2</a></li>
+                    <li class="tab"><a href="#day3-talks">Day 3</a></li>
                 </ul>
             </div>
-            <table class="responsive-table bordered striped day1">
-                <thead>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+            <div id="day1-talks" class="col s12">
+                <div class="filter-wrapper left hide hide-on-med-and-down">Filtered by: <span class="filters"></span>
+                </div>
+                <div class="day1-track-filter dropdown-wrapper hide-on-med-and-down right">Filter
+                    <ul class="dropdown">
+                    </ul>
+                </div>
+                <table class="responsive-table bordered striped day1">
+                    <thead>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="day2-talks" class="col s12">
+                <div class="filter-wrapper left hide hide-on-med-and-down">
+                    Filtered by: <span class="filters"></span>
+                </div>
+                <div class="day2-track-filter dropdown-wrapper hide-on-med-and-down right">Filter
+                    <ul class="dropdown">
+                    </ul>
+                </div>
+                <table class="responsive-table bordered striped day2">
+                    <thead>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="day3-talks" class="col s12">
+                <div class="filter-wrapper left hide hide-on-med-and-down">
+                    Filtered by: <span class="filters"></span>
+                </div>
+                <div class="day3-track-filter dropdown-wrapper hide-on-med-and-down right">Filter
+                    <ul class="dropdown">
+                    </ul>
+                </div>
+                <table class="responsive-table bordered striped day3">
+                    <thead>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div id="day2" class="col s12">
-            <div class="filter-wrapper left hide hide-on-med-and-down">Filtered by: <span class="filters"></span></div>
-            <div id="day2-track-filter" class="dropdown-wrapper hide-on-med-and-down right">Filter
-                <ul class="dropdown">
+        <div id="workshops" class="col s12">
+            <div class="col s12">
+                <ul class="tabs">
+                    <li class="tab"><a href="#day1-workshops" class="active">Day 1</a></li>
+                    <li class="tab"><a href="#day2-workshops">Day 2</a></li>
+                    <li class="tab"><a href="#day3-workshops">Day 3</a></li>
                 </ul>
             </div>
-            <table class="responsive-table bordered striped day2">
-                <thead>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>
-        <div id="day3" class="col s12">
-            <div class="filter-wrapper left hide hide-on-med-and-down">Filtered by: <span class="filters"></span></div>
-            <div id="day3-track-filter" class="dropdown-wrapper hide-on-med-and-down right">Filter
-                <ul class="dropdown">
-                </ul>
+            <div id="day1-workshops" class="col s12">
+                <div class="filter-wrapper left hide hide-on-med-and-down">
+                    Filtered by: <span class="filters"></span></div>
+                <div class="day1-track-filter dropdown-wrapper hide-on-med-and-down right">Filter
+                    <ul class="dropdown">
+                    </ul>
+                </div>
+                <table class="responsive-table bordered striped day1">
+                    <thead>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
             </div>
-            <table class="responsive-table bordered striped day3">
-                <thead>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+            <div id="day2-workshops" class="col s12">
+                <div class="filter-wrapper left hide hide-on-med-and-down">
+                    Filtered by: <span class="filters"></span></div>
+                <div class="day2-track-filter dropdown-wrapper hide-on-med-and-down right">Filter
+                    <ul class="dropdown">
+                    </ul>
+                </div>
+                <table class="responsive-table bordered striped day2">
+                    <thead>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="day3-workshops" class="col s12">
+                <div class="filter-wrapper left hide hide-on-med-and-down">
+                    Filtered by: <span class="filters"></span></div>
+                <div class="day3-track-filter dropdown-wrapper hide-on-med-and-down right">Filter
+                    <ul class="dropdown">
+                    </ul>
+                </div>
+                <table class="responsive-table bordered striped day3">
+                    <thead>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -102,11 +166,13 @@
                     <span class="session-speakers"></span>
                 </div>
                 <div>
-                    <i class="tiny material-icons session-track-icon">local_offer</i><span class="session-track"></span>
+                    <i class="tiny material-icons session-track-icon">local_offer</i><span
+                        class="session-track"></span>
                 </div>
                 <i class="tiny material-icons session-start-icon">event</i><span class="session-start"></span>
                 <i class="tiny material-icons session-room-icon">place</i><span class="session-room"></span>
-                <i class="tiny material-icons session-duration-icon">schedule</i><span class="session-duration"></span>
+                <i class="tiny material-icons session-duration-icon">schedule</i><span
+                    class="session-duration"></span>
             </div>
             <div class="session-description"></div>
         </div>
