@@ -87,22 +87,21 @@ var FieldOption = function (type, name, options) {
 function signInListener() {
     firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
-                $("#container").hide();
-
                 $(".user-photo").attr("src", user.photoURL);
                 $(".user-name").text(user.displayName);
                 $(".user-email").text(user.email);
-
-                $("#firebaseui-auth-container").hide();
 
                 $('ul.tabs').tabs();
                 $(".button-collapse").sideNav();
                 $('.modal').modal();
 
-                $("#container").show();
+                $("#firebaseui-auth-container").hide();
+
+                checkPermission();
             } else {
                 $("#firebaseui-auth-container").show();
-                $("#container").hide();
+                $("#container").addClass("hide");
+
                 login();
             }
         }, function (error) {
@@ -118,6 +117,28 @@ function signInListener() {
         }, function (error) {
             console.error("Sign Out Error", error);
         });
+    });
+}
+
+function checkPermission() {
+    var checkAccessRef = firebase.database().ref().child("checkAccess");
+
+    checkAccessRef.once('value', function (snapshot) {
+        $("#container").removeClass("hide");
+    }, function (error) {
+        var html = "<div id='modal-permission' class='modal'>" +
+            "<div class='modal-content'>" +
+            "<h4>Permission Denied</h4>" +
+            "<p>Sorry you don't have premission to access this page</p>" +
+            "</div>" +
+            "<div class='modal-footer'>" +
+            "<a href='#!' class=' modal-action modal-close waves-effect waves-green btn-flat'>Ok!</a>" +
+            "</div>" +
+            "</div>";
+        $("#container").html(html);
+        $("#container").removeClass("hide");
+        $('.modal').modal();
+        $('#modal-permission').modal('open');
     });
 }
 
