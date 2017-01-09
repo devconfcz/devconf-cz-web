@@ -365,7 +365,7 @@ function sessions() {
         var description = (session.description) ? session.description : "";
 
         content.find("h5").text(session.title);
-        content.find(".session-description").html(description);
+        content.find(".session-description").html(description.replace(/\n/g, '<br />'));
         content.find(".session-speakers").html(getSpeakers(session.speakers));
         content.find(".session-info .session-track").text(session.track);
         content.find(".session-info .session-room").text(session.room);
@@ -446,7 +446,7 @@ function sessions() {
         modal.find(".speaker-name").text(speaker.name);
         modal.find(".speaker-country").text(speaker.country);
         modal.find(".speaker-organization").text(speaker.organization);
-        modal.find(".speaker-bio").text(speaker.bio);
+        modal.find(".speaker-bio").html(speaker.bio.replace(/\n/g, '<br />'));
 
         var twitterHTML = "";
         if (speaker.twitter) {

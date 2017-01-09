@@ -78,7 +78,7 @@ function speakers() {
         modal.find(".speaker-name").text(speaker.name);
         modal.find(".speaker-country").text(speaker.country);
         modal.find(".speaker-organization").text(speaker.organization);
-        modal.find(".speaker-bio").text(speaker.bio);
+        modal.find(".speaker-bio").text(speaker.bio.replace(/\n/g, '<br />'));
 
         var twitterHTML = "";
         if (speaker.twitter) {
