@@ -211,7 +211,8 @@ function sessions() {
         var html = "<div id='" + session.id + "' class='session hoverable'>" +
             "<div class='session-title'>" + session.title + "</div>" +
             "<div class='hide-on-med-and-down session-track'>" +
-            "<i class='tiny material-icons'>local_offer</i>" + session.track +
+            "<div><i class='tiny material-icons'>local_offer</i>" + session.track + "</div>" +
+            "<div><i class='tiny material-icons'>schedule</i>" + session.duration + "</div>" +
             "</div>" +
             "</div>";
 
@@ -285,7 +286,6 @@ function sessions() {
             ? "talks" : "workshops";
     }
 
-
     /**
      * Check if this is a workshop or talk session
      *
@@ -348,7 +348,6 @@ function sessions() {
             theList.append(itm);
         });
     }
-
 
     /**
      * Show session details
