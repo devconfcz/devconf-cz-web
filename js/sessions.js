@@ -371,6 +371,7 @@ function sessions() {
         content.find(".session-info .session-track").text(session.track);
         content.find(".session-info .session-room").text(session.room);
         content.find(".session-info .session-duration").text(session.duration);
+        content.find(".session-info .session-difficulty").text(session.difficulty);
         content.find(".session-info .session-start").text("Day " + session.day + " at " + session.start);
 
 
