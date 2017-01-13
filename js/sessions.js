@@ -442,7 +442,12 @@ function sessions() {
         var speaker = speakers[speakerId];
         var modal = $('#speaker-detail');
 
-        modal.find(".speaker-image").attr("src", speaker.avatar);
+        // Load image from Firebase Storage
+        var avatarRef = firebase.storage().ref().child("speakers/" + speaker.email  + ".png");
+        avatarRef.getDownloadURL().then(function (url) {
+            modal.find(".speaker-image").attr("src", url);
+        });
+
         modal.find(".speaker-name").text(speaker.name);
         modal.find(".speaker-country").text(speaker.country);
         modal.find(".speaker-organization").text(speaker.organization);

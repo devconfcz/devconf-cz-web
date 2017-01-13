@@ -19,9 +19,9 @@ function speakers() {
 
         displaySpeakers();
 
-        if(window.location.hash) {
+        if (window.location.hash) {
             var speakerId = window.location.hash.replace("#", "");
-            if(speakers[speakerId]) {
+            if (speakers[speakerId]) {
                 $(window.location.hash)[0].scrollIntoView();
                 showSpeakerDetails(speakerId);
             }
@@ -48,7 +48,7 @@ function speakers() {
     // -- Helper methods ----------------------------------------------------------------------------------------------
 
     function displaySpeakers() {
-        for(id in speakers) {
+        for (id in speakers) {
             addNewSpeakerCard(speakers[id]);
         }
 
@@ -62,19 +62,31 @@ function speakers() {
      * @param speaker speaker instance
      */
     function addNewSpeakerCard(speaker) {
+
         var html = "<div id='" + speaker.id + "' class='card speaker hoverable'>" +
-            "<div class='card-image speaker-image' style='background-image: url(\"" + speaker.avatar + "\")'>" +
+            "<div class='card-image speaker-image'>" +
             "<span class='card-title speaker-name'>" + speaker.name + "</span>" +
             "</div>";
 
         $('.speakers-container').append(html);
+
+        // Load image from Firebase Storage
+        var avatarRef = firebase.storage().ref().child("speakers/" + speaker.email  + ".png");
+        avatarRef.getDownloadURL().then(function (url) {
+            $("#" + speaker.id).find(".speaker-image").css('background-image', 'url(' + url + ')');
+        });
     }
 
     function showSpeakerDetails(speakerId) {
         var speaker = speakers[speakerId];
         var modal = $('#speaker-detail');
 
-        modal.find(".speaker-image").attr("src", speaker.avatar);
+        // Load image from Firebase Storage
+        var avatarRef = firebase.storage().ref().child("speakers/" + speaker.email  + ".png");
+        avatarRef.getDownloadURL().then(function (url) {
+            modal.find(".speaker-image").attr("src", url);
+        });
+
         modal.find(".speaker-name").text(speaker.name);
         modal.find(".speaker-country").text(speaker.country);
         modal.find(".speaker-organization").text(speaker.organization);
