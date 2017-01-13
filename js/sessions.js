@@ -442,6 +442,8 @@ function sessions() {
         var speaker = speakers[speakerId];
         var modal = $('#speaker-detail');
 
+        modal.find(".speaker-image").attr("src", "/imgs/person-placeholder.jpg");
+
         // Load image from Firebase Storage
         var avatarRef = firebase.storage().ref().child("speakers/" + speaker.email  + ".jpg");
         avatarRef.getDownloadURL().then(function (url) {
