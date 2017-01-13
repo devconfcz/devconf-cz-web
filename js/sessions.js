@@ -443,7 +443,7 @@ function sessions() {
         var modal = $('#speaker-detail');
 
         // Load image from Firebase Storage
-        var avatarRef = firebase.storage().ref().child("speakers/" + speaker.email  + ".png");
+        var avatarRef = firebase.storage().ref().child("speakers/" + speaker.email  + ".jpg");
         avatarRef.getDownloadURL().then(function (url) {
             modal.find(".speaker-image").attr("src", url);
         });

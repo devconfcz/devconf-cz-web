@@ -71,7 +71,7 @@ function speakers() {
         $('.speakers-container').append(html);
 
         // Load image from Firebase Storage
-        var avatarRef = firebase.storage().ref().child("speakers/" + speaker.email  + ".png");
+        var avatarRef = firebase.storage().ref().child("speakers/" + speaker.email  + ".jpg");
         avatarRef.getDownloadURL().then(function (url) {
             $("#" + speaker.id).find(".speaker-image").css('background-image', 'url(' + url + ')');
         });
@@ -82,7 +82,7 @@ function speakers() {
         var modal = $('#speaker-detail');
 
         // Load image from Firebase Storage
-        var avatarRef = firebase.storage().ref().child("speakers/" + speaker.email  + ".png");
+        var avatarRef = firebase.storage().ref().child("speakers/" + speaker.email  + ".jpg");
         avatarRef.getDownloadURL().then(function (url) {
             modal.find(".speaker-image").attr("src", url);
         });
