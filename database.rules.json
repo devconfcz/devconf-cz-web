@@ -31,8 +31,10 @@
       ".write": true
     },
     "favorites": {
-      ".read": true,
-      ".write": "auth != null"
+      "$user_id": {
+        ".read": "$user_id === auth.uid",
+        ".write": "$user_id === auth.uid"
+      }
     }
   }
 }
