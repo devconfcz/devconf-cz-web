@@ -213,6 +213,32 @@ i.tiny.material-icons {
     margin-right: 5px;
 }
 
+i.material-icons {
+    color: #ffffff;
+}
+
+.session-favorite-icon, .session-feedback-icon {
+    cursor: pointer;
+}
+
+.input-field {
+    color: #fff;
+}
+
+.input-field label {
+    color: #fff;
+}
+
+/* label focus color */
+.input-field input[type=text]:focus + label {
+    color: #fff;
+}
+/* label underline focus color */
+.input-field input[type=text]:focus {
+    border-bottom: 1px solid #fff;
+    box-shadow: 0 1px 0 0 #fff;
+}
+
 /**********************************************************************************************************************
  * SPEAKERS
  *********************************************************************************************************************/

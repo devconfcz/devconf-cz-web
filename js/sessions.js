@@ -10,13 +10,35 @@ function sessions() {
     var tracks = {};
     var speakers = [];
     var sessions = [];
+    var votes = {};
+    var favorites = [];
+
+    var user = null;
 
     // Init -----------------------------------------------------------------------------------------------------------
 
     retrieveRooms();
 
+    firebase.auth().onAuthStateChanged(function (currentUser) {
+            if (currentUser) {
+                user = currentUser;
+                retrieveVotes();
+                retrieveFavorites();
+            } else {
+                user = null;
+                votes = {};
+                favorites = [];
+            }
+        }, function (error) {
+            console.log(error);
+        }
+    );
+
     // http://materializecss.com/modals.html#initialization
     $('.modal').modal();
+
+    // http://materializecss.com/forms.html#select-initialization
+    $('select').material_select();
 
     // -- HTML Triggers -----------------------------------------------------------------------------------------------
 
@@ -26,7 +48,7 @@ function sessions() {
             event.preventDefault();
             var sessionId = $(this).attr("id");
             if (sessionId) {
-                openSessionModal(sessions[sessionId]);
+                openSessionDetails(sessions[sessionId]);
             }
         })
         // When click on filter dropdown, open/close it
@@ -43,12 +65,36 @@ function sessions() {
         .on("click", ".speaker-link", function (event) {
             event.preventDefault();
             var speakerId = $(this).attr("href").split("#")[1];
-            showSpeakerDetails(speakerId);
+            openSpeakerDetails(speakerId);
         })
-        // When click speaker name on session details, open a modal with speaker details
-        .on("click", ".back", function (event) {
+        // When click in favorite on session page or detail
+        .on("click", ".session-favorite-icon", function (event) {
             event.preventDefault();
-            $('#speaker-detail').modal('close');
+            if (!user) {
+                openSignInModal();
+            } else {
+                favorite($("#session-detail").find(".session-id").text());
+            }
+        })
+        // When click in feedback/vote on session page or detail
+        .on("click", ".session-feedback-icon", function (event) {
+            event.preventDefault();
+            if (!user) {
+                openSignInModal();
+            } else {
+                openFeedbackForm($("#session-detail").find(".session-id").text());
+            }
+        })
+        // When click in sign in
+        .on("click", "#google-sign-in", function (event) {
+            event.preventDefault();
+            $("#signin").modal('close');
+            openGoogleSignInPopup();
+        })
+        // When click in the save button on feedback/vote popup
+        .on("click", "#vote-send", function (event) {
+            event.preventDefault();
+            saveFeedback();
         });
 
     // -- Helper methods ----------------------------------------------------------------------------------------------
@@ -68,8 +114,6 @@ function sessions() {
             createTableHeader();
 
             retrieveTracks();
-            retrieveSpeakers();
-            retrieveSessions();
         });
     }
 
@@ -84,6 +128,8 @@ function sessions() {
                 var track = childSnapshot.val();
                 tracks[formatTrack(track.name)] = track;
             });
+
+            retrieveSpeakers();
         });
     }
 
@@ -98,6 +144,8 @@ function sessions() {
                 var speaker = childSnapshot.val();
                 speakers[speaker.id] = speaker;
             });
+
+            retrieveSessions();
         });
     }
 
@@ -118,6 +166,51 @@ function sessions() {
             displaySessions();
         });
 
+    }
+
+    /**
+     * Retrieve a list of sessions id what the user have vote
+     */
+    function retrieveVotes() {
+        var favoritesRef = firebase.database().ref().child("votes").child(user.uid);
+
+        favoritesRef.on("child_added", function (snapshot) {
+            votes[snapshot.key] = snapshot.val();
+            updateFeedbackForm(snapshot.key);
+        });
+
+        favoritesRef.on("child_changed", function (snapshot) {
+            votes[snapshot.key] = snapshot.val();
+            updateFeedbackForm(snapshot.key);
+        });
+
+        favoritesRef.on("child_removed", function (snapshot) {
+            delete votes[snapshot.key];
+            updateFeedbackForm(snapshot.key);
+        });
+    }
+
+    /**
+     * Retrieve a list of sessions id what the user have favorites
+     */
+    function retrieveFavorites() {
+        var favoritesRef = firebase.database().ref().child("favorites").child(user.uid);
+
+        favoritesRef.on("child_added", function (snapshot) {
+            var sessionId = snapshot.val();
+            favorites.push(sessionId);
+
+            markSessionAsFavorited(sessionId);
+        });
+
+        favoritesRef.on("child_removed", function (snapshot) {
+            var sessionId = snapshot.val();
+            var index = favorites.indexOf(sessionId);
+            if (index != -1) {
+                favorites.splice(index, 1);
+                markSessionAsNotFavorited(sessionId)
+            }
+        });
     }
 
     function displaySessions() {
@@ -333,54 +426,6 @@ function sessions() {
     }
 
     /**
-     * Sort the <ul> list
-     *
-     * @param theList
-     */
-    function sortUnorderedList(theList) {
-        var listitems = theList.children('li').get();
-
-        listitems.sort(function (a, b) {
-            return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
-        });
-
-        $.each(listitems, function (idx, itm) {
-            theList.append(itm);
-        });
-    }
-
-    /**
-     * Show session details
-     *
-     * @param session Session
-     */
-    function openSessionModal(session) {
-
-        var modal = $("#session-detail");
-        var content = modal.find(".modal-content");
-        var footer = modal.find(".modal-footer");
-
-        modal.css("background-color", tracks[formatTrack(session.track)].color);
-
-        var description = (session.description) ? session.description : "";
-
-        content.find("h5").text(session.title);
-        content.find(".session-description").html(description.replace(/\n/g, '<br />'));
-        content.find(".session-speakers").html(getSpeakers(session.speakers));
-        content.find(".session-info .session-track").text(session.track);
-        content.find(".session-info .session-room").text(session.room);
-        content.find(".session-info .session-duration").text(session.duration);
-        content.find(".session-info .session-difficulty").text(session.difficulty);
-        content.find(".session-info .session-start").text("Day " + session.day + " at " + session.start);
-
-
-        (session.speakers) ? $(".session-speakers-icon").removeClass("hide") : $(".session-speakers-icon").addClass("hide");
-
-        modal.modal('open');
-
-    }
-
-    /**
      * Filter session by track
      *
      * @param input Checkbox (track) clicked
@@ -417,35 +462,50 @@ function sessions() {
     }
 
     /**
-     * Speaker formatter
+     * Show session details
      *
-     * @param speakersId Speakers id
-     * @returns {string} Speakers formatted
+     * @param session Session
      */
-    function getSpeakers(speakersId) {
-        var s = "";
+    function openSessionDetails(session) {
 
-        if (speakersId) {
-            for (i = 0; i < speakersId.length; i++) {
-                var speaker = speakers[speakersId[i]];
-                s += "<a href='/speakers#" + speakers[speakersId[i]].id + "' class='speaker-link'>" + speaker.name + "</a>";
-                if (speakersId.length - 1 > i) {
-                    s += " & ";
-                }
-            }
-        }
+        var modal = $("#session-detail");
+        var content = modal.find(".modal-content");
+        var footer = modal.find(".modal-footer");
 
-        return s;
+        modal.css("background-color", tracks[formatTrack(session.track)].color);
+
+        var description = (session.description) ? session.description : "";
+        var favoriteIcon = (favorites.indexOf(session.id) != -1) ? "favorite" : "favorite_border";
+
+        content.find(".session-id").text(session.id);
+
+        content.find("h5").text(session.title);
+        content.find(".session-description").html(description.replace(/\n/g, '<br />'));
+        content.find(".session-speakers").html(getSpeakers(session.speakers));
+        content.find(".session-info .session-track").text(session.track);
+        content.find(".session-info .session-room").text(session.room);
+        content.find(".session-info .session-duration").text(session.duration);
+        content.find(".session-info .session-difficulty").text(session.difficulty);
+        content.find(".session-info .session-start").text("Day " + session.day + " at " + session.start);
+
+        content.find(".session-favorite-icon").text(favoriteIcon);
+
+        var speakerIcon = $(".session-speakers-icon");
+        (session.speakers) ? speakerIcon.removeClass("hide") : speakerIcon.addClass("hide");
+
+        modal.modal('open');
+
     }
 
-    function showSpeakerDetails(speakerId) {
+
+    function openSpeakerDetails(speakerId) {
         var speaker = speakers[speakerId];
         var modal = $('#speaker-detail');
 
         modal.find(".speaker-image").attr("src", "/imgs/person-placeholder.jpg");
 
         // Load image from Firebase Storage
-        var avatarRef = firebase.storage().ref().child("speakers/" + speaker.email  + ".jpg");
+        var avatarRef = firebase.storage().ref().child("speakers/" + speaker.email + ".jpg");
         avatarRef.getDownloadURL().then(function (url) {
             modal.find(".speaker-image").attr("src", url);
         });
@@ -468,6 +528,174 @@ function sessions() {
     }
 
     /**
+     * Open a popup explaining user need to sign in
+     */
+    function openSignInModal() {
+        $("#signin").modal('open');
+    }
+
+    /**
+     * Open a Google sign in popup
+     */
+    function openGoogleSignInPopup() {
+        var provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('https://www.googleapis.com/auth/plus.login');
+        firebase.auth().signInWithPopup(provider).then(function (result) {
+            user = result.user;
+        }).catch(function (error) {
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            var email = error.email;
+            var credential = error.credential;
+        });
+    }
+
+    /**
+     * Open the vote modal
+     *
+     * @param sessionId The ID of the sassion going to be voted
+     */
+    function openFeedbackForm(sessionId) {
+        var session = sessions[sessionId];
+        var modal = $("#voting");
+
+        var vote = votes[sessionId];
+
+        modal.css("background-color", tracks[formatTrack(session.track)].color);
+        modal.find(".session-id").text(session.id);
+        modal.find(".session-title").text(session.title);
+        modal.find("#vote-rating").val((vote) ? vote.rating : "");
+        modal.find("#vote-comment").val((vote) ? vote.feedback : "");
+
+        $('select').material_select();
+        Materialize.updateTextFields();
+
+        modal.modal('open');
+    }
+
+    /**
+     * Save the vote/feedback about the session/talk
+     */
+    function saveFeedback() {
+        var modal = $("#voting");
+        var sessionId = modal.find(".session-id").text();
+        var rating  = modal.find("#vote-rating").val();
+        var comment = modal.find("#vote-comment").val();
+
+        if(!rating) {
+            alert("Rating is required");
+            return;
+        }
+
+        var data = {};
+        data["rating"] = rating;
+        data["feedback"] = comment;
+
+        var voteRef = firebase.database().ref().child("votes").child(user.uid).child(sessionId);
+        voteRef.set(data, function (error) {
+            if (error) {
+                alert("An error occurred while processing your request");
+            } else {
+                modal.modal('close');
+            }
+        });
+    }
+
+    /**
+     * If a feedback was added/updated in another device and the feedback (popup) is opened update it in realtime
+     *
+     * @param sessionId The ID of the session
+     */
+    function updateFeedbackForm(sessionId) {
+        var modal = $("#voting");
+
+        var vote = votes[sessionId];
+
+        modal.find("#vote-rating").val((vote) ? vote.rating : "");
+        modal.find("#vote-comment").val((vote) ? vote.feedback : "");
+
+        $('select').material_select();
+        Materialize.updateTextFields();
+    }
+
+    /**
+     * Add/remove favorite session
+     *
+     * @param sessionId The ID of the session
+     */
+    function favorite(sessionId) {
+        var favoritesRef = firebase.database().ref().child("favorites").child(user.uid).child(sessionId);
+        if (favorites.indexOf(sessionId) == -1) {
+            favoritesRef.set(sessionId);
+        } else {
+            favoritesRef.remove();
+        }
+    }
+
+    /**
+     * If a session was favorite in another device and the session details (popup) is opened update it in realtime
+     *
+     * @param sessionId The ID of the session
+     */
+    function markSessionAsFavorited(sessionId) {
+        var modal = $("#session-detail");
+        if (modal.find(".session-id").text() == sessionId) {
+            modal.find(".session-favorite-icon").text("favorite");
+        }
+    }
+
+    /**
+     * If a session was unfavorite in another device and the session details (popup) is opened update it in realtime
+     *
+     * @param sessionId The ID of the session
+     */
+    function markSessionAsNotFavorited(sessionId) {
+        var modal = $("#session-detail");
+        if (modal.find(".session-id").text() == sessionId) {
+            modal.find(".session-favorite-icon").text("favorite_border");
+        }
+    }
+
+    /**
+     * Speaker formatter
+     *
+     * @param speakersId Speakers id
+     * @returns {string} Speakers formatted
+     */
+    function getSpeakers(speakersId) {
+        var s = "";
+
+        if (speakersId) {
+            for (i = 0; i < speakersId.length; i++) {
+                var speaker = speakers[speakersId[i]];
+                s += "<a href='/speakers#" + speakers[speakersId[i]].id + "' class='speaker-link'>" + speaker.name + "</a>";
+                if (speakersId.length - 1 > i) {
+                    s += " & ";
+                }
+            }
+        }
+
+        return s;
+    }
+
+    /**
+     * Sort the <ul> list
+     *
+     * @param theList
+     */
+    function sortUnorderedList(theList) {
+        var listitems = theList.children('li').get();
+
+        listitems.sort(function (a, b) {
+            return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
+        });
+
+        $.each(listitems, function (idx, itm) {
+            theList.append(itm);
+        });
+    }
+
+    /**
      * Log session on console
      *
      * @param session
@@ -482,6 +710,5 @@ function sessions() {
             "Title: " + session.title
         );
     }
-
 
 }

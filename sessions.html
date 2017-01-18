@@ -160,18 +160,30 @@
 
     <div id="session-detail" class="modal modal-fixed-footer">
         <div class="modal-content">
-            <h5 class="session-title"></h5>
+            <span class="session-id hide"></span>
+            <div class="row">
+                <div class="item col s10 m11">
+                    <h5 class="session-title"></h5>
+                </div>
+                <div class="item col s2 m1 right">
+                    <i class="material-icons session-favorite-icon hide">favorite_border</i>
+                    <i class="material-icons session-feedback-icon">feedback</i>
+                </div>
+            </div>
             <div class="session-info">
                 <div>
-                    <i class="tiny material-icons session-speakers-icon">person</i><span class="session-speakers"></span>
+                    <i class="tiny material-icons session-speakers-icon">person</i><span
+                        class="session-speakers"></span>
                 </div>
                 <div>
                     <i class="tiny material-icons session-track-icon">local_offer</i><span class="session-track"></span>
+                    <i class="tiny material-icons session-difficulty-icon">warning</i>
+                    <span class="session-difficulty"></span>
                 </div>
                 <i class="tiny material-icons session-start-icon">event</i><span class="session-start"></span>
                 <i class="tiny material-icons session-room-icon">place</i><span class="session-room"></span>
                 <i class="tiny material-icons session-duration-icon">schedule</i><span class="session-duration"></span>
-                <i class="tiny material-icons session-difficulty-icon">warning</i><span class="session-difficulty"></span>
+
             </div>
             <div class="session-description"></div>
         </div>
@@ -202,6 +214,43 @@
         </div>
     </div>
 
+    <div id="signin" class="modal">
+        <div class="modal-content">
+            <h4>Sign In</h4>
+            <p>To use this feature you need to be logged in your Google account.</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-action waves-effect waves-green btn-flat modal-close">No way</a>
+            <a href="#!" id="google-sign-in" class="modal-action waves-effect waves-green btn-flat">Ok</a>
+        </div>
+    </div>
+
+    <div id="voting" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <h5 class="session-title"></h5>
+            <span class="session-id hide"></span>
+            <div class='input-field'>
+                <select id="vote-rating">
+                    <option value="" disabled selected>Choose your option</option>
+                    <option value="1">Really Bad</option>
+                    <option value="2">Bad</option>
+                    <option value="3">OK</option>
+                    <option value="4">Good</option>
+                    <option value="5">Awesome</option>
+                </select>
+                <label for="vote-rating">Rating:</label>
+            </div>
+
+            <div class='input-field'>
+                <label for="vote-comment">Comment:</label>
+                <textarea id="vote-comment" class='materialize-textarea' rows='10'></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-action waves-effect waves-green btn-flat modal-close">Close</a>
+            <a href="#!" id="vote-send" class="modal-action waves-effect waves-green btn-flat">Send</a>
+        </div>
+    </div>
 </div>
 </body>
 </html>
