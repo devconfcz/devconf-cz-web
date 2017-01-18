@@ -35,7 +35,7 @@ $(function () {
             new FieldOption(FieldType.TEXT, "country"),
             new FieldOption(FieldType.TEXT, "organization"),
             new FieldOption(FieldType.TEXT, "twitter"),
-            new FieldOption(FieldType.TEXTAREA, "bio", {cols: 10, truncate: 70})
+            new FieldOption(FieldType.TEXTAREA, "bio", {rows: 10, truncate: 70})
         ],
         data: {},
         databaseRef: firebase.database().ref().child("speakers"),
@@ -54,7 +54,7 @@ $(function () {
             new FieldOption(FieldType.TEXT, "day"),
             new FieldOption(FieldType.TEXT, "start"),
             new FieldOption(FieldType.TEXT, "duration"),
-            new FieldOption(FieldType.TEXTAREA, "description", {cols: 10, truncate: 40})
+            new FieldOption(FieldType.TEXTAREA, "description", {rows: 10, truncate: 40})
         ],
         data: {},
         databaseRef: firebase.database().ref().child("sessions"),
@@ -449,7 +449,7 @@ function configure(config) {
                     html += "<div class='input-field'>" +
                         "<label for='" + createIdName(field.name) + "'>" + field.name + ":</label>" +
                         "<textarea id='" + createIdName(field.name) + "' " +
-                        "class='materialize-textarea' rows='" + field.options.cols + "'></textarea>" +
+                        "class='materialize-textarea' rows='" + field.options.rows + "'></textarea>" +
                         "</div>";
                     break;
                 default:
