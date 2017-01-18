@@ -7,7 +7,9 @@
 		"ignore": [
 			".firebaserc",
 			"firebase.json",
-			"database-rules.json"
+			"database-rules.json",
+			".idea",
+			".git"
 		],
 		"cleanUrls": true
 	}
