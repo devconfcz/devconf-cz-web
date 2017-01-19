@@ -158,6 +158,14 @@ function sessions() {
             });
 
             displaySessions();
+
+            if (window.location.hash) {
+                var sessionId = window.location.hash.replace("#", "");
+                if (sessions[sessionId]) {
+                    $(window.location.hash)[0].scrollIntoView();
+                    openSessionDetails(sessions[sessionId]);
+                }
+            }
         });
 
     }
