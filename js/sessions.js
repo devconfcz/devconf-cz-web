@@ -433,8 +433,9 @@ function sessions() {
         var trackList = $("#" + type).find(".day" + session.day + "-track-filter ul");
         var trackId = formatTrack(session.track);
         if (!(trackList.find("li." + trackId).length)) {
+            var trackColor = (tracks[formatTrack(session.track)]) ? tracks[formatTrack(session.track)].color : "#FFFFFF";
             var html = "<li class='day" + session.day + " " + trackId + "'>" +
-                "<a href='#' style='border-left-color: " + tracks[formatTrack(session.track)].color + "'>" +
+                "<a href='#' style='border-left-color: " + trackColor + "'>" +
                 "<input type='checkbox' id='day" + session.day + "-" + trackId + "' name='" + trackId + "' " +
                 "class='track-filter' value='" + session.track + "'>" +
                 "<label for='day" + session.day + "-" + trackId + "'>" + session.track + "</label>" +
@@ -490,7 +491,9 @@ function sessions() {
 
         var modal = $("#session-detail");
 
-        modal.css("background-color", tracks[formatTrack(session.track)].color);
+        if (tracks[formatTrack(session.track)]) {
+            modal.css("background-color", tracks[formatTrack(session.track)].color);
+        }
 
         setSessionDetailOnModal(session);
 
@@ -524,7 +527,7 @@ function sessions() {
         // Vote/Feedback
         var vote = votes[session.id];
         modal.find("#vote-comment").val((vote) ? vote.feedback : "");
-        if(vote) {
+        if (vote) {
             modal.find("#vote-rating").barrating('set', vote.rating);
         } else {
             modal.find("#vote-rating").barrating('clear');
@@ -622,7 +625,7 @@ function sessions() {
         var vote = votes[sessionId];
 
         modal.find("#vote-comment").val((vote) ? vote.feedback : "");
-        if(vote) {
+        if (vote) {
             modal.find("#vote-rating").barrating('set', vote.rating);
         } else {
             modal.find("#vote-rating").barrating('clear');
