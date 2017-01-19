@@ -74,7 +74,7 @@ function sessions() {
         .on("click", ".session-favorite-icon", function (event) {
             event.preventDefault();
             if (!user) {
-                openSignInModal();
+                openSignIn();
             } else {
                 favorite($("#session-detail").find(".session-id").text());
             }
@@ -149,24 +149,42 @@ function sessions() {
     function retrieveSessions() {
         var sessionsRef = firebase.database().ref().child("sessions").orderByChild("start");
 
-        sessionsRef.once('value', function (snapshot) {
-            snapshot.forEach(function (childSnapshot) {
-                var session = childSnapshot.val();
-                sessions[session.id] = session;
+        sessionsRef.on("child_added", function (snapshot) {
+            var session = snapshot.val();
+            sessions[session.id] = session;
 
-                addSessionInTable(session);
-            });
+            addSessionInTable(session);
+        });
 
-            displaySessions();
+        sessionsRef.on("child_changed", function (snapshot) {
+            var session = snapshot.val();
+            sessions[session.id] = session;
 
-            if (window.location.hash) {
-                var sessionId = window.location.hash.replace("#", "");
-                if (sessions[sessionId]) {
-                    $(window.location.hash)[0].scrollIntoView();
-                    openSessionDetails(sessions[sessionId]);
-                }
+            $(session.id).remove();
+            addSessionInTable(session);
+
+            // If popup is opened, change the data there
+            var modal = $("#session-detail");
+            if (modal.find(".session-id").text() == session.id) {
+                setSessionDetailOnModal(session);
             }
         });
+
+        sessionsRef.on("child_removed", function (snapshot) {
+            delete sessions[snapshot.key];
+
+            $(session.id).remove();
+        });
+
+        displaySessions();
+
+        if (window.location.hash) {
+            var sessionId = window.location.hash.replace("#", "");
+            if (sessions[sessionId]) {
+                $(window.location.hash)[0].scrollIntoView();
+                openSessionDetails(sessions[sessionId]);
+            }
+        }
 
     }
 
@@ -471,26 +489,34 @@ function sessions() {
     function openSessionDetails(session) {
 
         var modal = $("#session-detail");
-        var content = modal.find(".modal-content");
-        var footer = modal.find(".modal-footer");
 
         modal.css("background-color", tracks[formatTrack(session.track)].color);
+
+        setSessionDetailOnModal(session);
+
+        modal.modal('open');
+
+    }
+
+    function setSessionDetailOnModal(session) {
+
+        var modal = $("#session-detail");
 
         var description = (session.description) ? session.description : "";
         var favoriteIcon = (favorites.indexOf(session.id) != -1) ? "favorite" : "favorite_border";
 
-        content.find(".session-id").text(session.id);
+        modal.find(".session-id").text(session.id);
 
-        content.find(".session-title").text(session.title);
-        content.find(".session-speakers").html(getSpeakers(session.speakers));
-        content.find(".session-info .session-track").text(session.track);
-        content.find(".session-info .session-difficulty").text(session.difficulty);
-        content.find(".session-info .session-start").text("Day " + session.day + " at " + session.start);
-        content.find(".session-info .session-room").text(session.room);
-        content.find(".session-info .session-duration").text(session.duration);
-        content.find(".session-description").html(description.replace(/\n/g, '<br />'));
+        modal.find(".session-title").text(session.title);
+        modal.find(".session-speakers").html(getSpeakers(session.speakers));
+        modal.find(".session-info .session-track").text(session.track);
+        modal.find(".session-info .session-difficulty").text(session.difficulty);
+        modal.find(".session-info .session-start").text("Day " + session.day + " at " + session.start);
+        modal.find(".session-info .session-room").text(session.room);
+        modal.find(".session-info .session-duration").text(session.duration);
+        modal.find(".session-description").html(description.replace(/\n/g, '<br />'));
 
-        content.find(".session-favorite-icon").text(favoriteIcon);
+        modal.find(".session-favorite-icon").text(favoriteIcon);
 
         var speakerIcon = $(".session-speakers-icon");
         (session.speakers) ? speakerIcon.removeClass("hide") : speakerIcon.addClass("hide");
@@ -504,10 +530,7 @@ function sessions() {
             modal.find("#vote-rating").barrating('clear');
         }
 
-        modal.modal('open');
-
     }
-
 
     function openSpeakerDetails(speakerId) {
         var speaker = speakers[speakerId];
@@ -541,7 +564,7 @@ function sessions() {
     /**
      * Open a popup explaining user need to sign in
      */
-    function openSignInModal() {
+    function openSignIn() {
         $("#signin").modal('open');
     }
 
