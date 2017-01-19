@@ -592,6 +592,12 @@ function sessions() {
      * Save the vote/feedback about the session/talk
      */
     function saveFeedback() {
+
+        if(!user) {
+            openSignIn();
+            return;
+        }
+
         var modal = $("#session-detail");
         var sessionId = modal.find(".session-id").text();
         var rating = modal.find("#vote-rating").val();
