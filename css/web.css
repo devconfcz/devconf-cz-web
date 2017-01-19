@@ -140,23 +140,13 @@ table.responsive-table td {
 .session {
     padding: 1px 5px 1px 5px;
     cursor: pointer;
+    color: #ffffff;
 }
 
 @media (min-width: 993px) {
     .session {
         padding: 10px;
     }
-}
-
-.session-title,
-.session-description,
-.session-speakers,
-.session-info,
-.session-room,
-.session-track,
-.session-speakers,
-.session-speakers a {
-    color: #FFFFFF;
 }
 
 .session-time {
@@ -191,6 +181,10 @@ table.responsive-table td {
     }
 }
 
+#session-detail, .session-speakers a {
+    color: #ffffff;
+}
+
 .session-description {
     margin-top: 10px;
     margin-bottom: 15px;
@@ -208,16 +202,7 @@ table.responsive-table td {
     line-height: normal;
 }
 
-i.tiny.material-icons {
-    margin-top: 5px;
-    margin-right: 5px;
-}
-
-i.material-icons {
-    color: #ffffff;
-}
-
-.session-favorite-icon, .session-feedback-icon {
+.session-favorite-icon {
     cursor: pointer;
 }
 
