@@ -12,9 +12,31 @@ function speakers() {
     var speakersRef = firebase.database().ref().child("speakers").orderByChild("name");
 
     speakersRef.once('value', function (snapshot) {
-        snapshot.forEach(function (childSnapshot) {
-            var speaker = childSnapshot.val();
+        speakersRef.on("child_added", function (snapshot) {
+            var speaker = snapshot.val();
             speakers[speaker.id] = speaker;
+
+            addNewSpeakerCard(speaker)
+        });
+
+        speakersRef.on("child_changed", function (snapshot) {
+            var speaker = snapshot.val();
+            speakers[speaker.id] = speaker;
+
+            updateSpeakerCardInfo(speaker);
+
+            // If popup is opened, change the data there
+            var modal = $("#speaker-detail");
+            if (modal.find(".speaker-id").text() == speaker.id) {
+                setSpeakerDetailOnModal(speaker);
+            }
+        });
+
+        speakersRef.on("child_removed", function (snapshot) {
+            var speaker = snapshot.val();
+            delete speakers[snapshot.key];
+
+            $(speaker.id).remove();
         });
 
         displaySpeakers();
@@ -48,10 +70,6 @@ function speakers() {
     // -- Helper methods ----------------------------------------------------------------------------------------------
 
     function displaySpeakers() {
-        for (id in speakers) {
-            addNewSpeakerCard(speakers[id]);
-        }
-
         $(".preloader-wrapper").addClass("hide");
     }
 
@@ -79,9 +97,24 @@ function speakers() {
         });
     }
 
+    function updateSpeakerCardInfo(speaker) {
+        var speakerCard = $("div#" + speaker.id);
+        speakerCard.find(".speaker-name").text(speaker.name);
+    }
+
     function showSpeakerDetails(speakerId) {
         var speaker = speakers[speakerId];
         var modal = $('#speaker-detail');
+
+        setSpeakerDetailOnModal(speaker)
+
+        modal.modal('open');
+    }
+
+    function setSpeakerDetailOnModal(speaker) {
+        var modal = $('#speaker-detail');
+
+        modal.find(".speaker-id").text(speaker.id);
 
         modal.find(".speaker-image").attr("src", "/imgs/person-placeholder.jpg");
 
@@ -104,8 +137,6 @@ function speakers() {
 
         }
         modal.find(".speaker-twitter").html(twitterHTML);
-
-        modal.modal('open');
     }
 
 }

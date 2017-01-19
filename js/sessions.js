@@ -171,6 +171,7 @@ function sessions() {
         });
 
         sessionsRef.on("child_removed", function (snapshot) {
+            var session = sessions[snapshot.key];
             delete sessions[snapshot.key];
 
             $(session.id).remove();
