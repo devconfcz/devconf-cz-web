@@ -48,6 +48,7 @@ $(function () {
         fieldId: "key",
         fields: [
             new FieldOption(FieldType.TEXT, "title"),
+            new FieldOption(FieldType.TEXT, "type"),
             new FieldOption(FieldType.TEXT, "track"),
             new FieldOption(FieldType.TEXT, "difficulty"),
             new FieldOption(FieldType.TEXT, "room"),
@@ -535,7 +536,7 @@ function configure(config) {
             }
         });
 
-        config.databaseRef.child(key).set(data, function (error) {
+        config.databaseRef.child(key).update(data, function (error) {
             if (error) {
                 alert("Data could not be saved." + error);
             }
