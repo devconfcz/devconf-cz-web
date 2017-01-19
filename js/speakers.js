@@ -76,7 +76,6 @@ function speakers() {
     /**
      * Add a new material design card with the speaker
      *
-     * @param id Speaker ID
      * @param speaker speaker instance
      */
     function addNewSpeakerCard(speaker) {
@@ -106,24 +105,28 @@ function speakers() {
         var speaker = speakers[speakerId];
         var modal = $('#speaker-detail');
 
-        setSpeakerDetailOnModal(speaker)
+        loadSpeakerImageOnModal(speaker);
+        setSpeakerDetailOnModal(speaker);
 
         modal.modal('open');
+    }
+
+    function loadSpeakerImageOnModal(speaker) {
+        var modal = $('#speaker-detail');
+
+        modal.find(".speaker-image").attr("src", "/imgs/person-placeholder.jpg");
+
+        // Load image from Firebase Storage
+        var avatarRef = firebase.storage().ref().child("speakers/" + speaker.email + ".jpg");
+        avatarRef.getDownloadURL().then(function (url) {
+            modal.find(".speaker-image").attr("src", url);
+        });
     }
 
     function setSpeakerDetailOnModal(speaker) {
         var modal = $('#speaker-detail');
 
         modal.find(".speaker-id").text(speaker.id);
-
-        modal.find(".speaker-image").attr("src", "/imgs/person-placeholder.jpg");
-
-        // Load image from Firebase Storage
-        var avatarRef = firebase.storage().ref().child("speakers/" + speaker.email  + ".jpg");
-        avatarRef.getDownloadURL().then(function (url) {
-            modal.find(".speaker-image").attr("src", url);
-        });
-
         modal.find(".speaker-name").text(speaker.name);
         modal.find(".speaker-country").text(speaker.country);
         modal.find(".speaker-organization").text(speaker.organization);
