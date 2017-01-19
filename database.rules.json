@@ -32,7 +32,7 @@
         ".read": "$user_id === auth.uid",
         "$session_id": {
           ".write": "$user_id === auth.uid",
-          ".validate": "newData.hasChildren(['rating'])",
+          ".validate": "root.child('sessions').hasChild($session_id) && newData.hasChildren(['rating'])",
           "rating": {
             ".validate": "newData.val().matches(/^[1-5]$/i)"
           }
@@ -42,7 +42,10 @@
     "favorites": {
       "$user_id": {
         ".read": "$user_id === auth.uid",
-        ".write": "$user_id === auth.uid"
+        ".write": "$user_id === auth.uid",
+        "$session_id": {
+          ".validate": "root.child('sessions').hasChild($session_id)"
+        }
       }
     }
   }
