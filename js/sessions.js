@@ -37,8 +37,11 @@ function sessions() {
     // http://materializecss.com/modals.html#initialization
     $('.modal').modal();
 
-    // http://materializecss.com/forms.html#select-initialization
-    $('select').material_select();
+    // http://antenna.io/demo/jquery-bar-rating/examples/
+    $('#vote-rating').barrating({
+        theme: 'fontawesome-stars',
+        showSelectedRating: false
+    });
 
     // -- HTML Triggers -----------------------------------------------------------------------------------------------
 
@@ -74,15 +77,6 @@ function sessions() {
                 openSignInModal();
             } else {
                 favorite($("#session-detail").find(".session-id").text());
-            }
-        })
-        // When click in feedback/vote on session page or detail
-        .on("click", ".session-feedback-icon", function (event) {
-            event.preventDefault();
-            if (!user) {
-                openSignInModal();
-            } else {
-                openFeedbackForm($("#session-detail").find(".session-id").text());
             }
         })
         // When click in sign in
@@ -479,19 +473,28 @@ function sessions() {
 
         content.find(".session-id").text(session.id);
 
-        content.find("h5").text(session.title);
-        content.find(".session-description").html(description.replace(/\n/g, '<br />'));
+        content.find(".session-title").text(session.title);
         content.find(".session-speakers").html(getSpeakers(session.speakers));
         content.find(".session-info .session-track").text(session.track);
-        content.find(".session-info .session-room").text(session.room);
-        content.find(".session-info .session-duration").text(session.duration);
         content.find(".session-info .session-difficulty").text(session.difficulty);
         content.find(".session-info .session-start").text("Day " + session.day + " at " + session.start);
+        content.find(".session-info .session-room").text(session.room);
+        content.find(".session-info .session-duration").text(session.duration);
+        content.find(".session-description").html(description.replace(/\n/g, '<br />'));
 
         content.find(".session-favorite-icon").text(favoriteIcon);
 
         var speakerIcon = $(".session-speakers-icon");
         (session.speakers) ? speakerIcon.removeClass("hide") : speakerIcon.addClass("hide");
+
+        // Vote/Feedback
+        var vote = votes[session.id];
+        modal.find("#vote-comment").val((vote) ? vote.feedback : "");
+        if(vote) {
+            modal.find("#vote-rating").barrating('set', vote.rating);
+        } else {
+            modal.find("#vote-rating").barrating('clear');
+        }
 
         modal.modal('open');
 
@@ -551,38 +554,15 @@ function sessions() {
     }
 
     /**
-     * Open the vote modal
-     *
-     * @param sessionId The ID of the sassion going to be voted
-     */
-    function openFeedbackForm(sessionId) {
-        var session = sessions[sessionId];
-        var modal = $("#voting");
-
-        var vote = votes[sessionId];
-
-        modal.css("background-color", tracks[formatTrack(session.track)].color);
-        modal.find(".session-id").text(session.id);
-        modal.find(".session-title").text(session.title);
-        modal.find("#vote-rating").val((vote) ? vote.rating : "");
-        modal.find("#vote-comment").val((vote) ? vote.feedback : "");
-
-        $('select').material_select();
-        Materialize.updateTextFields();
-
-        modal.modal('open');
-    }
-
-    /**
      * Save the vote/feedback about the session/talk
      */
     function saveFeedback() {
-        var modal = $("#voting");
+        var modal = $("#session-detail");
         var sessionId = modal.find(".session-id").text();
-        var rating  = modal.find("#vote-rating").val();
+        var rating = modal.find("#vote-rating").val();
         var comment = modal.find("#vote-comment").val();
 
-        if(!rating) {
+        if (!rating) {
             alert("Rating is required");
             return;
         }
@@ -607,14 +587,16 @@ function sessions() {
      * @param sessionId The ID of the session
      */
     function updateFeedbackForm(sessionId) {
-        var modal = $("#voting");
-
+        var modal = $("#session-detail");
         var vote = votes[sessionId];
 
-        modal.find("#vote-rating").val((vote) ? vote.rating : "");
         modal.find("#vote-comment").val((vote) ? vote.feedback : "");
+        if(vote) {
+            modal.find("#vote-rating").barrating('set', vote.rating);
+        } else {
+            modal.find("#vote-rating").barrating('clear');
+        }
 
-        $('select').material_select();
         Materialize.updateTextFields();
     }
 

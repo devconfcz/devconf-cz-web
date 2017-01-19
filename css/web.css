@@ -123,14 +123,14 @@ table.responsive-table td {
 
 /* No CSS3 support */
 
-.no-opacity       .dropdown-wrapper .dropdown,
+.no-opacity .dropdown-wrapper .dropdown,
 .no-pointerevents .dropdown-wrapper .dropdown {
     display: none;
     opacity: 1; /* If opacity support but no pointer-events support */
     pointer-events: auto; /* If pointer-events support but no pointer-events support */
 }
 
-.no-opacity       .dropdown-wrapper.active .dropdown,
+.no-opacity .dropdown-wrapper.active .dropdown,
 .no-pointerevents .dropdown-wrapper.active .dropdown {
     display: block;
 }
@@ -221,11 +221,7 @@ i.material-icons {
     cursor: pointer;
 }
 
-.input-field {
-    color: #fff;
-}
-
-.input-field label {
+.input-field, .input-field label, legend {
     color: #fff;
 }
 
@@ -233,10 +229,19 @@ i.material-icons {
 .input-field input[type=text]:focus + label {
     color: #fff;
 }
+
 /* label underline focus color */
 .input-field input[type=text]:focus {
     border-bottom: 1px solid #fff;
     box-shadow: 0 1px 0 0 #fff;
+}
+
+.br-wrapper {
+    margin-top: 10px;
+}
+
+.input-field {
+    margin-top: 30px;
 }
 
 /**********************************************************************************************************************

@@ -12,6 +12,7 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script type="text/javascript"
             src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+    <script type="text/javascript" src="js/jquery.barrating.min.js"></script>
     <script type="text/javascript" src="js/global.js"></script>
     <script type="text/javascript" src="js/sessions.js"></script>
 
@@ -19,6 +20,9 @@
     <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
     <link type="text/css" rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+    <link type="text/css" rel="stylesheet"
+          href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="css/fontawesome-stars.css">
     <link type="text/css" rel="stylesheet" href="css/global.css">
     <link type="text/css" rel="stylesheet" href="css/web.css">
 
@@ -161,15 +165,8 @@
     <div id="session-detail" class="modal modal-fixed-footer">
         <div class="modal-content">
             <span class="session-id hide"></span>
-            <div class="row">
-                <div class="item col s10 m11">
-                    <h5 class="session-title"></h5>
-                </div>
-                <div class="item col s2 m1 right">
-                    <i class="material-icons session-favorite-icon hide">favorite_border</i>
-                    <i class="material-icons session-feedback-icon">feedback</i>
-                </div>
-            </div>
+            <h5><span class="session-title"></span><i
+                    class="material-icons session-favorite-icon right hide">favorite_border</i></h5>
             <div class="session-info">
                 <div>
                     <i class="tiny material-icons session-speakers-icon">person</i><span
@@ -186,9 +183,26 @@
 
             </div>
             <div class="session-description"></div>
+            <fieldset>
+                <legend>Feedback:</legend>
+                <div id="wrapper" style="text-align: center">
+                    <select id="vote-rating" name="rating" autocomplete="off" style="display: inline-block;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                <div class='input-field'>
+                    <label for="vote-comment">Comment:</label>
+                    <textarea id="vote-comment" class='materialize-textarea' rows='10'></textarea>
+                </div>
+            </fieldset>
         </div>
         <div class="modal-footer">
             <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+            <a href="#!" id="vote-send" class="modal-action waves-effect waves-green btn-flat">Send Feedback</a>
         </div>
     </div>
 
@@ -222,33 +236,6 @@
         <div class="modal-footer">
             <a href="#!" class="modal-action waves-effect waves-green btn-flat modal-close">No way</a>
             <a href="#!" id="google-sign-in" class="modal-action waves-effect waves-green btn-flat">Ok</a>
-        </div>
-    </div>
-
-    <div id="voting" class="modal modal-fixed-footer">
-        <div class="modal-content">
-            <h5 class="session-title"></h5>
-            <span class="session-id hide"></span>
-            <div class='input-field'>
-                <select id="vote-rating">
-                    <option value="" disabled selected>Choose your option</option>
-                    <option value="1">Really Bad</option>
-                    <option value="2">Bad</option>
-                    <option value="3">OK</option>
-                    <option value="4">Good</option>
-                    <option value="5">Awesome</option>
-                </select>
-                <label for="vote-rating">Rating:</label>
-            </div>
-
-            <div class='input-field'>
-                <label for="vote-comment">Comment:</label>
-                <textarea id="vote-comment" class='materialize-textarea' rows='10'></textarea>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <a href="#!" class="modal-action waves-effect waves-green btn-flat modal-close">Close</a>
-            <a href="#!" id="vote-send" class="modal-action waves-effect waves-green btn-flat">Send</a>
         </div>
     </div>
 </div>
