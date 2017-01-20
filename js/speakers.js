@@ -87,8 +87,6 @@ function speakers() {
 
         $('.speakers-container').append(html);
 
-        $("#" + speaker.id).find(".speaker-image").css('background-image', 'url(\'/imgs/person-placeholder.jpg\')');
-
         // Load image from Firebase Storage
         var avatarRef = firebase.storage().ref().child("speakers/" + speaker.email  + ".jpg");
         avatarRef.getDownloadURL().then(function (url) {
@@ -105,13 +103,13 @@ function speakers() {
         var speaker = speakers[speakerId];
         var modal = $('#speaker-detail');
 
-        loadSpeakerImageOnModal(speaker);
+        loadSpeakerAvatarOnModal(speaker);
         setSpeakerDetailOnModal(speaker);
 
         modal.modal('open');
     }
 
-    function loadSpeakerImageOnModal(speaker) {
+    function loadSpeakerAvatarOnModal(speaker) {
         var modal = $('#speaker-detail');
 
         modal.find(".speaker-image").attr("src", "/imgs/person-placeholder.jpg");

@@ -534,6 +534,8 @@ function sessions() {
             modal.find("#vote-rating").barrating('clear');
         }
 
+        Materialize.updateTextFields();
+
     }
 
     function openSpeakerDetails(speakerId) {
