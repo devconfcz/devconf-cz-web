@@ -325,6 +325,7 @@ function sessions() {
         var html = "<div id='" + session.id + "' class='session hoverable'>" +
             "<div class='session-title'>" + session.title + "</div>" +
             "<div class='hide-on-med-and-down session-track'>" +
+	    "<div><i class='tiny material-icons'>person</i>" + getSpeakers(session.speakers,false) + "</div>" +
             "<div><i class='tiny material-icons'>local_offer</i>" + session.track + "</div>" +
             "<div><i class='tiny material-icons'>schedule</i>" + session.duration + "</div>" +
             "</div>" +
@@ -512,7 +513,7 @@ function sessions() {
         modal.find(".session-id").text(session.id);
 
         modal.find(".session-title").text(session.title);
-        modal.find(".session-speakers").html(getSpeakers(session.speakers));
+        modal.find(".session-speakers").html(getSpeakers(session.speakers,true));
         modal.find(".session-info .session-track").text(session.track);
         modal.find(".session-info .session-difficulty").text(session.difficulty);
         modal.find(".session-info .session-start").text("Day " + session.day + " at " + session.start);
@@ -687,13 +688,18 @@ function sessions() {
      * @param speakersId Speakers id
      * @returns {string} Speakers formatted
      */
-    function getSpeakers(speakersId) {
+    function getSpeakers(speakersId,link) {
         var s = "";
 
         if (speakersId) {
             for (i = 0; i < speakersId.length; i++) {
                 var speaker = speakers[speakersId[i]];
-                s += "<a href='/speakers#" + speakers[speakersId[i]].id + "' class='speaker-link'>" + speaker.name + "</a>";
+		if(link == true){
+	                s += "<a href='/speakers#" + speakers[speakersId[i]].id + "' class='speaker-link'>" + speaker.name + "</a>";
+		}else{
+			s += speaker.name;
+			return s;
+		}
                 if (speakersId.length - 1 > i) {
                     s += " & ";
                 }
