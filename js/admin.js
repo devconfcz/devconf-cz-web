@@ -313,7 +313,7 @@ function configure(config) {
             "<tbody>" +
             "</tbody>" +
             "</table>" +
-            "<a href='#' id='" + createIdName("item-add") + "' class='btn-floating btn-large waves-effect waves-light red'><i class='material-icons'>add</i></a>" +
+//            "<a href='#' id='" + createIdName("item-add") + "' class='btn-floating btn-large waves-effect waves-light red'><i class='material-icons'>add</i></a>" +
             "</div>" +
             "</div>";
 
