@@ -27,17 +27,8 @@
       ".write": "auth != null && root.child('admins').hasChild(auth.uid)"
     },
     "votes": {
-      ".read": "root.child('admins').hasChild(auth.uid)",
-      "$user_id": {
-        ".read": "$user_id === auth.uid",
-        "$session_id": {
-          ".write": "$user_id === auth.uid",
-          ".validate": "root.child('sessions').hasChild($session_id) && newData.hasChildren(['rating'])",
-          "rating": {
-            ".validate": "newData.val().matches(/^[1-5]$/i)"
-          }
-        }
-      }
+      ".read": true,
+      ".write": false
     },
     "favorites": {
       "$user_id": {

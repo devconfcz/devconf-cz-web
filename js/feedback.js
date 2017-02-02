@@ -23,7 +23,7 @@ function sessions() {
                 retrieveVotes();
             } else {
                 user = null;
-                votes = {};
+                retrieveVotes();
             }
         }, function (error) {
             console.log(error);
